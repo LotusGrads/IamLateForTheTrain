@@ -53,12 +53,8 @@ fun SuperButton(service: PtvService) {
     Text(output)
     LaunchedEffect(key1 = "a") {
         delay(1000)
-        try {
-            val routeTypesResponse = service.getRouteTypes(
-                devid = "3002376",
-                signature = "EE9FF24FAF161C2FCD10DA238898D43851D79943"
-            )
-
+        output = try {
+            val routeTypesResponse = service.getRouteTypes()
             if (routeTypesResponse.isSuccessful) {
                 val successBody = routeTypesResponse.body()
                 output = "Success: ${successBody.toString()}"
@@ -85,3 +81,56 @@ fun DefaultPreview() {
         Greeting("Android")
     }
 }
+
+class SignatureAddingInterceptor(
+    private val privateKey: String,
+    private val developerId: Int,
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        //https://timetableapi.ptv.vic.gov.au/path?something=value
+        val url = request.url
+
+        //https://timetableapi.ptv.vic.gov.au/path?something=value&devid=$developerId&secret=$secretGoesHere
+        val newUrl = buildTTAPIURL(
+            baseURL = url.scheme + "://" + url.host,
+            privateKey = privateKey,
+            uri = url.encodedPath,
+            developerId = developerId,
+        )
+        // val newNewUrl = newUrl.toHttpUrl()
+        val newRequest = request.newBuilder()
+            .url(newUrl)
+            .build()
+
+        return chain.proceed(newRequest)
+    }
+
+    fun buildTTAPIURL(baseURL: String, privateKey: String, uri: String, developerId: Int): String {
+        val HMAC_SHA1_ALGORITHM = "HmacSHA1"
+        val uriWithDeveloperID = StringBuilder(uri).append(if (uri.contains("?")) "&" else "?")
+            .append("devid=$developerId")
+        val keyBytes = privateKey.toByteArray()
+        val uriBytes = uriWithDeveloperID.toString().toByteArray()
+        val signingKey = SecretKeySpec(keyBytes, HMAC_SHA1_ALGORITHM)
+        val mac = Mac.getInstance(HMAC_SHA1_ALGORITHM)
+        mac.init(signingKey)
+        val signatureBytes = mac.doFinal(uriBytes)
+        val signature = StringBuilder(signatureBytes.size * 2)
+        for (signatureByte in signatureBytes) {
+            val intVal = signatureByte.toInt() and 0xff
+            if (intVal < 0x10) {
+                signature.append("0")
+            }
+            signature.append(Integer.toHexString(intVal))
+        }
+        val url = StringBuilder(baseURL).append(uri).append(if (uri.contains("?")) "&" else "?")
+            .append("devid=$developerId").append("&signature=${signature.toString().toUpperCase()}")
+
+        return url.toString()
+    }
+}
+
+
+
+
