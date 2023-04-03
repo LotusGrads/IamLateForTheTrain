@@ -3,14 +3,18 @@ package com.example.ptvproject
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ptvproject.api.PtvService
 import com.example.ptvproject.ui.theme.PTVprojectTheme
 import kotlinx.coroutines.delay
@@ -37,36 +41,26 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column {
                         Greeting("Android")
-                        SuperButton(service)
+                        output(routeTypesViewModel)
+                        Trigger(routeTypesViewModel)
                     }
                 }
             }
         }
     }
+
+    @Composable
+    private fun Trigger(routeTypesViewModel: RouteTypesViewModel) {
+        Button(onClick = { routeTypesViewModel.getRouteTypes() }) {
+            Text("Get route types!")
+        }
+    }
 }
 
 @Composable
-fun SuperButton(service: PtvService) {
-    var output by remember {
-        mutableStateOf("test")
-    }
-    Text(output)
-    LaunchedEffect(key1 = "a") {
-        delay(1000)
-        output = try {
-            val routeTypesResponse = service.getRouteTypes()
-            if (routeTypesResponse.isSuccessful) {
-                val successBody = routeTypesResponse.body()
-                output = "Success: ${successBody.toString()}"
-            } else {
-                val errorBody = routeTypesResponse.errorBody().toString()
-                output = "Error: ${routeTypesResponse.code()} - $errorBody"
-            }
-        } catch (e: Throwable) {
-            output = "Exception: $e"
-        }
-    }
-
+fun output(routeTypesViewModel: RouteTypesViewModel) {
+    val state = routeTypesViewModel.stateFlow.collectAsState()
+    Text(state.value.outputText)
 }
 
 @Composable
