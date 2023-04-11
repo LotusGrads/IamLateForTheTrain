@@ -7,10 +7,7 @@ import retrofit2.http.Query
 
 interface PtvService {
     @GET("/v3/route_types")
-    suspend fun getRouteTypes(
-        @Query("devid") devid: String,
-        @Query("signature") signature: String,
-    ): Response<RouteTypeResponse>
+    suspend fun getRouteTypes(): Response<RouteTypeResponse>
     // http://timetableapi.ptv.vic.gov.au/v3/route_types?devid=3002376&signature=EE9FF24FAF161C2FCD10DA238898D43851D79943
 }
 

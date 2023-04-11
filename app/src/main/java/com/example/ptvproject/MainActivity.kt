@@ -16,23 +16,54 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ptvproject.api.PtvService
-import com.example.ptvproject.ui.theme.PTVprojectTheme
-import kotlinx.coroutines.delay
+import com.example.ptvproject.ui.routetypes.RouteTypesViewModel
+import com.example.ptvproject.ui.theme.PtvProjectTheme
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        val logger = HttpLoggingInterceptor(
+//            Logger() {
+//                Override fun log(message: String) {
+//                    Log.d("OkHttp", message);
+//                }
+//            }
+//        )
+
         val retrofit = Retrofit.Builder()
             .baseUrl("https://timetableapi.ptv.vic.gov.au/")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder()
+//                    .addNetworkInterceptor(logger)
+                    .addInterceptor(
+                        SignatureAddingInterceptor(
+                            privateKey = "79943beb-734e-4421-b1d6-1ce6b531baaf",
+                            developerId = 3002376,
+                        )
+                    )
+                    .build()
+            )
             .build()
 
         val service: PtvService = retrofit.create(PtvService::class.java)
         setContent {
-            PTVprojectTheme {
+            val routeTypesViewModel: RouteTypesViewModel = viewModel()
+
+            /*
+            val routeTypesViewModel = remember {
+                RouteTypesViewModel()
+            }*/
+
+            PtvProjectTheme {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -71,7 +102,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    PTVprojectTheme {
+    PtvProjectTheme {
         Greeting("Android")
     }
 }
