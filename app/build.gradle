@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp' version '1.7.0-1.0.6'
 }
 
 android {
@@ -26,6 +27,12 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+    }
+
+    applicationVariants.all { variant ->
+        variant.addJavaSourceFoldersToModel(
+                new File(buildDir, "generated/ksp/${variant.name}/kotlin")
+        )
     }
 
     buildTypes {
@@ -70,4 +77,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+
+    implementation 'io.github.raamcosta.compose-destinations:core:1.6.38-beta'
+    ksp 'io.github.raamcosta.compose-destinations:ksp:1.6.38-beta'
 }
