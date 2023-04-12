@@ -13,7 +13,15 @@ class SelectTrainStationViewModel: ViewModel() {
     // allow us to hide or make visible the search functionality
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
-    
+
+    // we need to check if the inputted answer matches anything from the database??
+    private val _doesSearchMatch = MutableStateFlow(false)
+    val doesSearchMatch = _doesSearchMatch.asStateFlow()
+
+    // function to check whether the user's input is correct
+
+    // function to change the search text according to user input
+
 }
 
 /* Logic here: the user selects a train station using a search pad and inputting
