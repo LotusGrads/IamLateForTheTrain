@@ -14,13 +14,20 @@ class SelectTrainStationViewModel : ViewModel() {
     fun searchInputUpdated(input: String) {
         viewModelScope.launch {
             if (input.length > 2) {
-                mutableTrainStateFlow.emit(
-                    SelectTrainStationState.ListOfStations(
-                        listOfTrains = listOf(
-                            TrainStations("Melbourne Central")
+                //TODO: Condition -> if train station list is empty
+                if (1==1) {
+                    mutableTrainStateFlow.emit(
+                        SelectTrainStationState.NoTrainStationsFound
+                    )
+                } else {
+                    mutableTrainStateFlow.emit(
+                        SelectTrainStationState.ListOfStations(
+                            listOfTrains = mutableListOf(
+                                TrainStations("Melbourne Central")
+                            )
                         )
                     )
-                )
+                }
             } else {
                 mutableTrainStateFlow.emit(
                     SelectTrainStationState.NoSearchQuery

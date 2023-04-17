@@ -5,7 +5,7 @@ sealed class SelectTrainStationState {
     object NoTrainStationsFound : SelectTrainStationState()
 
     data class ListOfStations(
-        val listOfTrains: List<TrainStations>
+        val listOfTrains: List<TrainStations> = listOf()
     ) : SelectTrainStationState()
 }
 

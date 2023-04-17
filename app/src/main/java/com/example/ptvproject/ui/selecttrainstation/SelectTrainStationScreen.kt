@@ -32,7 +32,9 @@ private fun SelectTrainStation(
             SelectTrainStationState.NoSearchQuery -> {
                 Text(text = "Please type something in")
             }
-            SelectTrainStationState.NoTrainStationsFound -> {}
+            SelectTrainStationState.NoTrainStationsFound -> {
+                Text(text = "No train stations found :'(")
+            }
         }
     }
 
