@@ -1,14 +1,12 @@
 package com.example.ptvproject.ui.selecttrainstation
 
+import com.example.ptvproject.model.PtvSearchResponse
+
 sealed class SelectTrainStationState {
     object NoSearchQuery : SelectTrainStationState()
     object NoTrainStationsFound : SelectTrainStationState()
 
     data class ListOfStations(
-        val listOfTrains: List<TrainStations> = listOf()
+        val listOfTrains: PtvSearchResponse
     ) : SelectTrainStationState()
 }
-
-data class TrainStations(
-    val name: String
-)

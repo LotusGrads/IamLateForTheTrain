@@ -1,18 +1,21 @@
 package com.example.ptvproject.api
 
+import android.util.Log
 import com.example.ptvproject.model.PtvSearchResponse
-import com.google.gson.annotations.SerializedName
 import okhttp3.OkHttpClient
 import okhttp3.Interceptor
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 private const val BASE_URL =
     "https://timetableapi.ptv.vic.gov.au/"
+
+private const val TAG = "PtvApiService"
 
 /**
  * Implement Retrofit service API
@@ -42,6 +45,7 @@ class SignatureAddingInterceptor(
         val request = chain.request()
         //https://timetableapi.ptv.vic.gov.au/path?something=value
         val url = request.url
+        Log.d(TAG, "initial request: $request")
 
         //https://timetableapi.ptv.vic.gov.au/path?something=value&devid=$developerId&secret=$secretGoesHere
         val newUrl = buildTTAPIURL(
@@ -55,6 +59,7 @@ class SignatureAddingInterceptor(
             .url(newUrl)
             .build()
 
+        Log.d(TAG, "new request: $newRequest")
         return chain.proceed(newRequest)
     }
 
@@ -87,7 +92,13 @@ class SignatureAddingInterceptor(
  * define how Retrofit talks to web server using HTTP requests
  * Use suspend to make it asynchronous and not block the calling thread
  */
-interface PtvSearchService {
-    @GET("/v3/search")
-    suspend fun getStation(): List<PtvSearchResponse>
+interface PtvApiService {
+    @GET("/v3/search/{search}")
+    suspend fun getStation(@Path("search") searchString: String): PtvSearchResponse
+}
+
+object PtvApi {
+    val retrofitService: PtvApiService by lazy {
+        retrofit.create(PtvApiService::class.java)
+    }
 }
