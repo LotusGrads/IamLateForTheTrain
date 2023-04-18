@@ -1,6 +1,7 @@
 package com.example.ptvproject.api
 
 import android.util.Log
+import com.example.ptvproject.model.PtvDeparturesResponse
 import com.example.ptvproject.model.PtvSearchResponse
 import okhttp3.OkHttpClient
 import okhttp3.Interceptor
@@ -100,6 +101,9 @@ class SignatureAddingInterceptor(
 interface PtvApiService {
     @GET("/v3/search/{search}")
     suspend fun getStation(@Path("search") searchString: String): Response1<PtvSearchResponse>
+
+    @GET("/v3/departures/route_type/{route_type}/stop/{stop_id}")
+    suspend fun getDepartures(@Path("stop_id") searchString: String): Response1<PtvDeparturesResponse>
 }
 
 object PtvApi {
