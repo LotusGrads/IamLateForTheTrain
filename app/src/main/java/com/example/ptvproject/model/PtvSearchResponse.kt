@@ -9,17 +9,18 @@ import com.google.gson.annotations.SerializedName
 
 // Linked to PtvSearchService
 data class PtvSearchResponse (
-    @SerializedName(value = "stops"    ) var stops    : ArrayList<Stops> = arrayListOf(),
+    @SerializedName(value = "stops"    ) var stops      : ArrayList<Stops>
 )
 
 data class Stops (
-    @SerializedName(value = "stop_name") var stopName : String?           = null,
-    @SerializedName(value = "stop_id"  ) var stopId   : Int?              = null,
-    @SerializedName(value = "routes"   ) var routes   : ArrayList<Routes> = arrayListOf()
+    @SerializedName(value = "stop_name" ) var stopName  : String,
+    @SerializedName(value = "stop_id"   ) var stopId    : Int,
+    @SerializedName(value = "routes"    ) var routes    : ArrayList<Routes>,
+    @SerializedName(value = "route_type") var routeType : Int
 )
 
 data class Routes (
-    @SerializedName(value = "route_name") var routeName : String? = null,
-    @SerializedName(value = "route_id"  ) var routeId   : Int?    = null,
-    @SerializedName(value = "route_type") var routeType : Int?    = null
+    @SerializedName(value = "route_name") var routeName : String,
+    @SerializedName(value = "route_id"  ) var routeId   : Int,
+    @SerializedName(value = "route_type") var routeType : Int
 )

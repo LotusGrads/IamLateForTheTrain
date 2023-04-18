@@ -27,13 +27,16 @@ private fun SelectTrainStation(
 
         when (stateOfTrains) {
             is SelectTrainStationState.ListOfStations -> {
-                Text(text = stateOfTrains.listOfTrains.toString())
+                Text(text = stateOfTrains.listOfStations.first().stationName)
             }
             SelectTrainStationState.NoSearchQuery -> {
                 Text(text = "Please type something in")
             }
             SelectTrainStationState.NoTrainStationsFound -> {
                 Text(text = "No train stations found :'(")
+            }
+            else -> {
+                Text(text = "ERROR")
             }
         }
     }

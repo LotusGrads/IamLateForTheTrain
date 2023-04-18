@@ -11,6 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import retrofit2.Response as Response1
 
 private const val BASE_URL =
     "https://timetableapi.ptv.vic.gov.au/"
@@ -94,7 +95,7 @@ class SignatureAddingInterceptor(
  */
 interface PtvApiService {
     @GET("/v3/search/{search}")
-    suspend fun getStation(@Path("search") searchString: String): PtvSearchResponse
+    suspend fun getStation(@Path("search") searchString: String): Response1<PtvSearchResponse>
 }
 
 object PtvApi {
