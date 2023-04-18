@@ -30,18 +30,19 @@ class SelectTrainStationViewModel : ViewModel() {
                         Log.d(TAG, "No train stations found")
                     } else {
                         Log.d(TAG, "stations founds")
-                        val trainStationList: MutableList<SelectTrainStationState.Station> =
-                            mutableListOf()
+                        val trainStationList: List<SelectTrainStationState.Station>
                         var station: SelectTrainStationState.Station
 
-                        for (stop in successBody) {
-                            if (stop.routeType == 0 && stop.stopName.contains(input, ignoreCase = true)) {
-                                Log.d(TAG, "valid station: ${stop.stopName}")
-                                station = SelectTrainStationState.Station(
-                                    stationName = stop.stopName,
-                                    stopId = stop.stopId
-                                )
-                                trainStationList.add(station)
+                        trainStationList = buildList {
+                            for (stop in successBody) {
+                                if (stop.routeType == 0 && stop.stopName.contains(input, ignoreCase = true)) {
+                                    Log.d(TAG, "valid station: ${stop.stopName}")
+                                    station = SelectTrainStationState.Station(
+                                        stationName = stop.stopName,
+                                        stopId = stop.stopId
+                                    )
+                                    add(station)
+                                }
                             }
                         }
 

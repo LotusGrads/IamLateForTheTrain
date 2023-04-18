@@ -8,7 +8,7 @@ sealed class SelectTrainStationState {
     object NoTrainStationsFound : SelectTrainStationState()
 
     data class ListOfStations(
-        val listOfStations: MutableList<Station>
+        val listOfStations: List<Station>
     ) : SelectTrainStationState()
 
     data class Station(
@@ -16,5 +16,3 @@ sealed class SelectTrainStationState {
         var stopId: Int
     ) : SelectTrainStationState()
 }
-
-// ListOfStations([Station("watergardens", 1), Station("Melbourne Central", 2)]
