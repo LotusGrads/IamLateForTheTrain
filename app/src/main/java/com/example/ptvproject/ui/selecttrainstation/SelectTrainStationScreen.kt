@@ -1,11 +1,18 @@
 package com.example.ptvproject.ui.selecttrainstation
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.layout.ModifierLocalPinnableParent
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 
 /**
@@ -16,24 +23,33 @@ import androidx.compose.runtime.*
 @Composable
 private fun SelectTrainStation(
     searchInputUpdated: (String) -> Unit,
-    stateOfTrains: SelectTrainStationState
+    stateOfTrains: SelectTrainStationState,
+    modifier: Modifier = Modifier
 ) {
 
-    Column() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         val input = remember { mutableStateOf("") }
 
-        TextField(value = input.value, onValueChange = { value ->
-            input.value = value
-            searchInputUpdated(value)
-        })
+        //TODO: Insert magnifying glass icon to leadingIcon
+        OutlinedTextField(
+            value = input.value,
+            onValueChange = { value: String ->
+                input.value = value
+                searchInputUpdated(value)
+            },
+            placeholder = { Text(text = "Search for a train station..") },
+            shape = RoundedCornerShape(50),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        )
 
         when (stateOfTrains) {
             is SelectTrainStationState.ListOfStations -> {
-                LazyColumn {
-                    items(stateOfTrains.listOfStations) {
-                        Text(text = it.stationName)
-                    }
-                }
+                TrainStationList(stationList = stateOfTrains.listOfStations)
             }
             SelectTrainStationState.NoSearchQuery -> {
                 Text(text = "Please type something in")
@@ -57,4 +73,28 @@ fun SelectTrainStation(viewModel: SelectTrainStationViewModel) {
         searchInputUpdated = { value: String -> viewModel.searchInputUpdated(value) },
         stateOfTrains = state
     )
+}
+
+@Composable
+private fun TrainStationCard(station: SelectTrainStationState.Station, modifier: Modifier = Modifier) {
+    Card(modifier = Modifier.padding(10.dp), elevation = 4.dp) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = station.stationName,
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TrainStationList(stationList: List<SelectTrainStationState.Station>) {
+    LazyColumn {
+        items(stationList) { station ->
+            TrainStationCard(station)
+        }
+    }
 }
