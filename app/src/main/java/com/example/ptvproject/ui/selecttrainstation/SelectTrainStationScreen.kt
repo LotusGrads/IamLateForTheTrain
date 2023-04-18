@@ -1,6 +1,8 @@
 package com.example.ptvproject.ui.selecttrainstation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
@@ -27,7 +29,11 @@ private fun SelectTrainStation(
 
         when (stateOfTrains) {
             is SelectTrainStationState.ListOfStations -> {
-                Text(text = stateOfTrains.listOfStations.first().stationName)
+                LazyColumn {
+                    items(stateOfTrains.listOfStations) {
+                        Text(text = it.stationName)
+                    }
+                }
             }
             SelectTrainStationState.NoSearchQuery -> {
                 Text(text = "Please type something in")
