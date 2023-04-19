@@ -15,7 +15,7 @@ class SelectTrainStationViewModel : ViewModel() {
         MutableStateFlow(SelectTrainStationState.NoSearchQuery)
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
-    fun searchInputUpdated(input: String) {
+    fun generateListOfTrains(input: String) {
         viewModelScope.launch() {
             if (input.length > 2) {
                 Log.d(TAG, "input: $input")
@@ -57,4 +57,5 @@ class SelectTrainStationViewModel : ViewModel() {
             }
         }
     }
+    
 }

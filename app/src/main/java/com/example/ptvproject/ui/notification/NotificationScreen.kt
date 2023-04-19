@@ -1,10 +1,11 @@
 package com.example.ptvproject.ui.notification
 
 import androidx.compose.runtime.Composable
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 @Composable
-fun NotificationScreen(stationId: Int, trainLineId: Int){}
+private fun Notification(stationId: Int, trainLineId: Int){}
 
 @Composable
-private fun NotificationScreen(vM: NotificationViewModel){}
+fun Notification(vM: NotificationViewModel){}

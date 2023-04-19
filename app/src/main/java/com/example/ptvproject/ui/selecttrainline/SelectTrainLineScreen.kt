@@ -1,11 +1,12 @@
 package com.example.ptvproject.ui.selecttrainline
 
 import androidx.compose.runtime.Composable
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 // get train station (id: INt)
 
 @Composable
-fun SelectTrainLineScreen(stationId: Int) {}
+private fun SelectTrainLine(stationId: Int) {}
 
 @Composable
-private fun SelectTrainLineScreen(vM: SelectTrainLineViewModel) {}
+fun SelectTrainLine(vM: SelectTrainLineViewModel, onClick: () -> Unit) {}
