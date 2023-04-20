@@ -6,7 +6,4 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 // get train station (id: INt)
 
 @Composable
-private fun SelectTrainLine(stationId: Int) {}
-
-@Composable
 fun SelectTrainLine(vM: SelectTrainLineViewModel, onClick: () -> Unit) {}

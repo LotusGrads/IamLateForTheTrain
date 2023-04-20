@@ -5,16 +5,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 /**
@@ -24,23 +26,24 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
  */
 
 @Composable
-fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onClick: () -> Unit) {
+fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onTrainStationSelected: (stopId: Int) -> Unit) {
     val state by viewModel.trainStateFlow.collectAsState()
 
     SelectTrainStation(
-        searchInputUpdated = { value: String -> viewModel.generateListOfTrains(value) },
+        onSearchClicked = { value: String -> viewModel.generateListOfTrains(value) },
         stateOfTrains = state,
-        onClick = onClick
+        onTrainStationSelected = onTrainStationSelected,
     )
 }
 
 @Composable
 private fun SelectTrainStation(
-    searchInputUpdated: (String) -> Unit,
+    onSearchClicked: (String) -> Unit,
     stateOfTrains: SelectTrainStationState,
-    onClick: () -> Unit,
+    onTrainStationSelected: (stopId: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -48,11 +51,23 @@ private fun SelectTrainStation(
     ) {
         val input = remember { mutableStateOf("") }
 
-        SearchBar(input = input, searchInputUpdated = searchInputUpdated)
+        SearchBar(
+            input = input,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearchClicked(input.value)
+                    focusManager.clearFocus()
+                }
+            )
+        )
 
         when (stateOfTrains) {
-            is SelectTrainStationState.ListOfStations -> {
-                TrainStationList(stationList = stateOfTrains.listOfStations, onClick = onClick)
+            is SelectTrainStationState.Success -> {
+                TrainStationList(stationList = stateOfTrains.listOfStations, onTrainStationSelected = onTrainStationSelected)
             }
             SelectTrainStationState.NoSearchQuery -> {
                 Text(text = "Please type something in")
@@ -60,8 +75,11 @@ private fun SelectTrainStation(
             SelectTrainStationState.NoTrainStationsFound -> {
                 Text(text = "No train stations found :'(")
             }
-            else -> {
-                Text(text = "ERROR")
+            SelectTrainStationState.Loading -> {
+                Text(text = "LOADING...")
+            }
+            SelectTrainStationState.Error -> {
+                Text(text = "FATAL ERROR!")
             }
         }
     }
@@ -71,7 +89,8 @@ private fun SelectTrainStation(
 @Composable
 private fun SearchBar(
     input: MutableState<String>,
-    searchInputUpdated: (String) -> Unit,
+    keyboardOptions: KeyboardOptions,
+    keyboardActions: KeyboardActions,
     modifier: Modifier = Modifier
 ) {
     //TODO: Insert magnifying glass icon to leadingIcon
@@ -79,10 +98,11 @@ private fun SearchBar(
         value = input.value,
         onValueChange = { value: String ->
             input.value = value
-            searchInputUpdated(value)
         },
         placeholder = { Text(text = "Search for a train station..") },
         shape = RoundedCornerShape(50),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp)
@@ -116,13 +136,13 @@ private fun TrainStationCard(
 @Composable
 private fun TrainStationList(
     stationList: List<SelectTrainStationState.Station>,
-    onClick: () -> Unit
+    onTrainStationSelected: (stopId: Int) -> Unit
 ) {
     LazyColumn {
         items(stationList) { station ->
             TrainStationCard(
                 station = station,
-                onClick = onClick
+                onClick = { onTrainStationSelected(station.stopId) }
             )
         }
     }

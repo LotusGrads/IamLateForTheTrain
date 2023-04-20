@@ -1,6 +1,8 @@
 package com.example.ptvproject
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ptvproject.destinations.SelectTrainLineDestination
 import com.example.ptvproject.ui.notification.Notification
 import com.example.ptvproject.ui.notification.NotificationViewModel
 import com.example.ptvproject.ui.selecttrainline.SelectTrainLine
@@ -13,17 +15,20 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination(start = true)
 @Composable
 fun SelectTrainStation(navigator: DestinationsNavigator) {
-    SelectTrainStation(viewModel = SelectTrainStationViewModel()) {
-        navigator.navigate(
-            SelectTrainLineDestination()
-        )
-    }
+    SelectTrainStation(
+        viewModel = SelectTrainStationViewModel(),
+        onTrainStationSelected = { stopId ->
+            navigator.navigate(
+                SelectTrainLineDestination(stopId)
+            )
+        }
+    )
 }
 
 @Destination
 @Composable
-fun SelectTrainLine(navigator: DestinationsNavigator) {
-    SelectTrainLine(vM = SelectTrainLineViewModel()) {
+fun SelectTrainLine(navigator: DestinationsNavigator, stopId: Int) {
+    SelectTrainLine(vM = SelectTrainLineViewModel(stationId = stopId)) {
 
     }
 }
@@ -31,5 +36,5 @@ fun SelectTrainLine(navigator: DestinationsNavigator) {
 @Destination
 @Composable
 fun Notification() {
-    Notification(vM = NotificationViewModel())
+    Notification(vM = NotificationViewModel(stationId = 1, trainLineId = 1))
 }

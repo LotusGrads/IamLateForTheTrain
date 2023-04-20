@@ -16,39 +16,52 @@ class SelectTrainStationViewModel : ViewModel() {
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
     fun generateListOfTrains(input: String) {
+        mutableTrainStateFlow.value = SelectTrainStationState.Loading
+
         viewModelScope.launch() {
             if (input.length > 2) {
                 Log.d(TAG, "input: $input")
                 val response = PtvApi.retrofitService.getStation(input)
-                val successBody = response.body()?.stops
 
-                if (successBody != null) {
-                    if (successBody.isEmpty()) {
-                        mutableTrainStateFlow.emit(
-                            SelectTrainStationState.NoTrainStationsFound
-                        )
-                        Log.d(TAG, "No train stations found")
-                    } else {
-                        Log.d(TAG, "stations founds")
+                if (response.isSuccessful) {
+                    val successBody = response.body()?.stops
 
-                        val trainStationList = buildList {
-                            for (stop in successBody) {
-                                if (stop.routeType == 0 && stop.stopName.contains(input, ignoreCase = true)) {
-                                    Log.d(TAG, "valid station: ${stop.stopName}")
-                                    var station = SelectTrainStationState.Station(
-                                        stationName = stop.stopName,
-                                        stopId = stop.stopId
-                                    )
-                                    add(station)
+                    if (successBody != null) {
+                        if (successBody.isEmpty()) {
+                            mutableTrainStateFlow.emit(
+                                SelectTrainStationState.NoTrainStationsFound
+                            )
+                            Log.d(TAG, "No train stations found")
+                        } else {
+                            Log.d(TAG, "stations founds")
+
+                            val trainStationList = buildList {
+                                for (stop in successBody) {
+                                    if (stop.routeType == 0 && stop.stopName.contains(
+                                            input,
+                                            ignoreCase = true
+                                        )
+                                    ) {
+                                        Log.d(TAG, "valid station: ${stop.stopName}")
+                                        var station = SelectTrainStationState.Station(
+                                            stationName = stop.stopName,
+                                            stopId = stop.stopId
+                                        )
+                                        add(station)
+                                    }
                                 }
                             }
-                        }
-                        mutableTrainStateFlow.emit(
-                            SelectTrainStationState.ListOfStations(
-                                listOfStations = trainStationList
+                            mutableTrainStateFlow.emit(
+                                SelectTrainStationState.Success(
+                                    listOfStations = trainStationList
+                                )
                             )
-                        )
+                        }
                     }
+                } else {
+                    mutableTrainStateFlow.emit(
+                        SelectTrainStationState.Error
+                    )
                 }
             } else {
                 mutableTrainStateFlow.emit(
@@ -57,5 +70,4 @@ class SelectTrainStationViewModel : ViewModel() {
             }
         }
     }
-    
 }
