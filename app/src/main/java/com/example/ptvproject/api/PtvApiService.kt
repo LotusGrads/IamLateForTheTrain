@@ -2,10 +2,11 @@ package com.example.ptvproject.api
 
 import android.util.Log
 import com.example.ptvproject.model.PtvDeparturesResponse
+import com.example.ptvproject.model.PtvRoutesResponse
 import com.example.ptvproject.model.PtvSearchResponse
 import okhttp3.OkHttpClient
 import okhttp3.Interceptor
-import okhttp3.Response
+import okhttp3.Response as OkHttpResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -13,7 +14,7 @@ import retrofit2.http.Path
 import java.util.concurrent.TimeUnit
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import retrofit2.Response as Response1
+import retrofit2.Response
 
 private const val BASE_URL =
     "https://timetableapi.ptv.vic.gov.au/"
@@ -47,7 +48,7 @@ class SignatureAddingInterceptor(
     private val privateKey: String,
     private val developerId: Int,
 ) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
+    override fun intercept(chain: Interceptor.Chain): OkHttpResponse {
         val request = chain.request()
         //https://timetableapi.ptv.vic.gov.au/path?something=value
         val url = request.url
@@ -100,11 +101,15 @@ class SignatureAddingInterceptor(
  */
 interface PtvApiService {
     @GET("/v3/search/{search}")
-    suspend fun getStation(@Path("search") searchString: String): Response1<PtvSearchResponse>
+    suspend fun getStation(@Path("search") searchString: String): Response<PtvSearchResponse>
 
     @GET("/v3/departures/route_type/{route_type}/stop/{stop_id}")
-    suspend fun getDepartures(@Path("stop_id") searchString: String): Response1<PtvDeparturesResponse>
+    suspend fun getDepartures(@Path("stop_id") stopId: Int): Response<PtvDeparturesResponse>
+
+    @GET("/v3/stops/{stop_id}/route_type/{route_type}")
+    suspend fun getRoutes(@Path("route_type") routes: Int): Response<PtvRoutesResponse>
 }
+
 
 object PtvApi {
     val retrofitService: PtvApiService by lazy {
