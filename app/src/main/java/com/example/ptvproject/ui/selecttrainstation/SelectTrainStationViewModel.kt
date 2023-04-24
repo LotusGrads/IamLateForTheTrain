@@ -33,7 +33,7 @@ class SelectTrainStationViewModel : ViewModel() {
                             )
                             Log.d(TAG, "No train stations found")
                         } else {
-                            Log.d(TAG, "stations founds")
+
 
                             val trainStationList = buildList {
                                 for (stop in successBody) {
@@ -51,6 +51,8 @@ class SelectTrainStationViewModel : ViewModel() {
                                     }
                                 }
                             }
+                            Log.d(TAG, "${trainStationList.size} stations founds")
+
                             mutableTrainStateFlow.emit(
                                 SelectTrainStationState.Success(
                                     listOfStations = trainStationList

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -17,7 +18,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-
 
 /**
  * Input: User inputs a string
@@ -64,7 +64,7 @@ private fun SelectTrainStation(
                 }
             )
         )
-
+        Spacer(modifier = Modifier.height(50.dp))
         when (stateOfTrains) {
             is SelectTrainStationState.Success -> {
                 TrainStationList(stationList = stateOfTrains.listOfStations, onTrainStationSelected = onTrainStationSelected)
@@ -76,7 +76,7 @@ private fun SelectTrainStation(
                 Text(text = "No train stations found :'(")
             }
             SelectTrainStationState.Loading -> {
-                Text(text = "LOADING...")
+                CircularProgressBar()
             }
             SelectTrainStationState.Error -> {
                 Text(text = "FATAL ERROR!")
@@ -146,4 +146,9 @@ private fun TrainStationList(
             )
         }
     }
+}
+
+@Composable
+private fun CircularProgressIndicator(modifier: Modifier = Modifier) {
+    CircularProgressIndicator()
 }
