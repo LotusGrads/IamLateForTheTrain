@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.time.ZonedDateTime
 
 class NotificationViewModel() : ViewModel() {
 
@@ -16,8 +17,18 @@ class NotificationViewModel() : ViewModel() {
 
     // need to take inputs from previous screens to display
 
+    var userOnTime = false
+    lateinit var userEstimatedArrivalTime: ZonedDateTime
+
+    var trainStationName: String = ""
+    var trainLineName = ""
+    lateinit var trainDepartureTime: ZonedDateTime
+
+
+
     // Do I need this function because I have not provided the parameters previously?
     private fun NotificationsUiState(): NotificationsUiState {
+
 
 
     }
