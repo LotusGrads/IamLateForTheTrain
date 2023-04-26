@@ -4,18 +4,34 @@ import com.google.gson.annotations.SerializedName
 
 
 data class PtvRoutesResponse (
-    @SerializedName("stop") var stop : Stop,
+
+    @SerializedName("route") var route : Route,
+    @SerializedName("status") var status : Status
+
 )
 
-data class Stop (
+data class Route (
 
-    @SerializedName("disruption_ids") var disruptionIds : List<Int>,
-    @SerializedName("station_type") var stationType : String,
-    @SerializedName("station_description") var stationDescription : String,
+    @SerializedName("route_service_status") var routeServiceStatus : RouteServiceStatus,
     @SerializedName("route_type") var routeType : Int,
-    @SerializedName("routes") var routes : List<Routes>,
-    @SerializedName("stop_id") var stopId : Int,
-    @SerializedName("stop_name") var stopName : String,
-    @SerializedName("stop_landmark") var stopLandmark : String
+    @SerializedName("route_id") var routeId : Int,
+    @SerializedName("route_name") var routeName : String,
+    @SerializedName("route_number") var routeNumber : String,
+    @SerializedName("route_gtfs_id") var routeGtfsId : String,
+    @SerializedName("geopath") var geopath : List<String>
+
+)
+
+data class RouteServiceStatus (
+
+    @SerializedName("description") var description : String,
+    @SerializedName("timestamp") var timestamp : String
+
+)
+
+data class Status (
+
+    @SerializedName("version") var version : String,
+    @SerializedName("health") var health : Int
 
 )

@@ -104,10 +104,10 @@ interface PtvApiService {
     suspend fun getStation(@Path("search") searchString: String): Response<PtvSearchResponse>
 
     @GET("/v3/departures/route_type/{route_type}/stop/{stop_id}")
-    suspend fun getDepartures(@Path("stop_id") stopId: Int): Response<PtvDeparturesResponse>
+    suspend fun getDepartures(@Path("route_type") routeType: Int = 0, @Path("stop_id") stopId: Int): Response<PtvDeparturesResponse>
 
-    @GET("/v3/stops/{stop_id}/route_type/{route_type}")
-    suspend fun getRoutes(@Path("route_type") routes: Int): Response<PtvRoutesResponse>
+    @GET("/v3/routes/{route_id}")
+    suspend fun getRoutes(@Path("route_id") routeId: Int): Response<PtvRoutesResponse>
 }
 
 

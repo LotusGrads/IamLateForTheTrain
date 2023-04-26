@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 data class PtvDeparturesResponse (
 
     @SerializedName("departures") var departures : List<Departures>,
-    @SerializedName("stops") var stops : Stops,
-    @SerializedName("routes") var routes : Routes,
-    @SerializedName("directions") var directions : Directions,
+    @SerializedName("stops") var stops : List<Stops>,
+    @SerializedName("routes") var routes : List<Routes>,
+    @SerializedName("directions") var directions : List<Directions>,
 
 
 )
