@@ -9,11 +9,11 @@ data class NotificationsUiState(
 
 data class UserInfo(
     val onTime: Boolean,
-    val estimatedArrivalTime: ZonedDateTime,
+    val estimatedArrivalTime: ZonedDateTime?,
 )
 
 data class TrainInfo(
     val stationName: String,
     val lineName: String,
-    val departureTime: ZonedDateTime,
+    val departureTime: ZonedDateTime?,
 )
