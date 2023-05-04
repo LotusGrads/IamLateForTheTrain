@@ -1,12 +1,21 @@
 package com.example.ptvproject.ui.notification
 
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
-fun NotificationScreen(stationId: Int, trainLineId: Int){}
+fun TrainInfoCard(
+    modifier: Modifier = Modifier,
+    userTrainInfo: NotificationViewModel) {
 
-@Composable
-private fun NotificationScreen(vM: NotificationViewModel){}
+    Text(
+        text = userTrainInfo
+    )
 
-// two parts to the screen. top = user, bottom = train
+
+
+
+}
