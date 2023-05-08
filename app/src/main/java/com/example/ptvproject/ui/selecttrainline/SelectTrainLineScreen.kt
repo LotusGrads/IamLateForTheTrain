@@ -1,58 +1,82 @@
 package com.example.ptvproject.ui.selecttrainline
 
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import android.app.Activity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ptvproject.ui.theme.PTVprojectTheme
 import androidx.compose.foundation.layout.Column as Column
+import com.example.ptvproject.ui.selecttrainline.ConfirmTrainLineDialog as ConfirmTrainLineDialog
 
-//Train Line Screen composable
 @Composable
 fun SelectTrainLineScreen(
-    options: List<TrainLineUiState>,
-    item: TrainLineUiState,
-    onSelectionChanged: (TrainLineUiState) -> Unit,
-    modifier: Modifier = Modifier
-    ) {
-    var selectedTrainLine by rememberSaveable { mutableStateOf("") }
+    selectTrainLineViewModel: SelectTrainLineViewModel = viewModel(),
+    listOfDepartures: List<TrainLineUiState>,
+    modifier: Modifier = Modifier,
+) {
+    val selectTrainLineUiState by selectTrainLineViewModel.uiState.collectAsState()
+    //:: function reference
 
-    LazyColumn(
+    SelectTrainLineContent(
+        trainLineUiState = selectTrainLineUiState,
+        updateTrainLineScreenState =  selectTrainLineViewModel::updateTrainLineScreenState
+    )
+    if (selectTrainLineUiState.isTrainLineConfirmed) {
+        ConfirmTrainLineDialog(
+            onConfirm = { selectTrainLineViewModel.updateTrainLineScreenState()})
+    }
+
+}
+
+@Composable
+fun SelectTrainLineContent(
+    modifier: Modifier = Modifier,
+    trainLineUiState: TrainLineUiState,
+    updateTrainLineScreenState: () -> String,
+) {
+    Column(
         modifier = modifier
+            .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
     ) {
+        Text(
+            text = trainLineUiState.stopName,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp
+        )
 
-            Text(
-                text = item.stopName,
-                //style = MaterialTheme.typography.h6
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                options.forEach { item ->
+        Spacer(modifier = Modifier.height(25.dp))
 
-                    SelectTrainLineItemRow(
-                        item = item,
-                        selectedTrainLine = selectedTrainLine,
-                        onSelectionItemChanged = { selectedTrainLine = item.routeName },
-                        onSelectionChanged = onSelectionChanged
-                    )
-                }
+        LazyColumn(
+            modifier = modifier
+                .padding(16.dp)
+        ) {
+            items(
+                trainLineUiState.listOfDepartures
+            ) { item ->
+                SelectTrainLineItemRow(
+                    item = item,
+                    selectedTrainLine = updateTrainLineScreenState(),
+                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -60,50 +84,56 @@ fun SelectTrainLineScreen(
 
 @Composable
 fun SelectTrainLineItemRow(
-    item: TrainLineUiState,
+    item: Departures,
     selectedTrainLine: String,
-    onSelectionItemChanged: (String) -> Unit,
-    onSelectionChanged: (TrainLineUiState) -> Unit,
-    modifier: Modifier = Modifier
-    ) {
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = Modifier.selectable(
+        modifier = Modifier
+            .border(width = 1.dp, color = Color(0xFF317B3A))
+            .selectable(
             selected = selectedTrainLine == item.routeName,
             onClick = {
-                onSelectionItemChanged(item.routeName)
-                onSelectionChanged(item)
             }
         ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            Text(
-                text = item.routeName
-            )
-            Text(
-                text = item.timeOfDeparture
-            )
-
-            Text(
-                text = item.trainLineDirection
-            )
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 12.dp)
+        ) {
+            Row{
+                Text(
+                    text = item.routeName,
+                    fontWeight = FontWeight.Bold
+                    )
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.End),
+                    text = item.direction
+                )
+            }
+            Column {
+                    item.listOfDepartureTimes.forEach {
+                        Text(text = "Leaving at: " + it.timeOfDeparture)
+                    }
+                }
+            }
         }
     }
-}
-
-//I want the train line screen to show the stopName at the top of the screen, in bold and in a different heading
-//The first item row shows the direction towards City
-//The second item row shows another direction e.g. Alamein
-//The third item row shows the next direction e.g. Craigeburn
-//And so on
-//Each item row shows the next three departures
 
 @Composable
-fun ConfirmTrainLineDialog() {
+private fun ConfirmTrainLineDialog(
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val activity = (LocalContext.current as Activity)
+
     AlertDialog(
         onDismissRequest = {
             //Dismiss dialog when user clicks outside dialog
-            // openDialog.value = false} }
         },
         title = {
             Text(text = "You have selected a train line!")
@@ -114,26 +144,130 @@ fun ConfirmTrainLineDialog() {
         confirmButton = {
             Button(
                 onClick = {
-                }) {
-                    Text("Confirm")
+                    onConfirm
                 }
+            ) {
+                Text("Confirm")
+            }
         },
         dismissButton = {
             Button(
                 onClick = {
-                }) {
+                    activity.finish()
+                }
+            ) {
                 Text("Back")
             }
         }
     )
 }
 
+@Preview
+@Composable
+fun TrainLineScreenPreview() {
+    PTVprojectTheme {
+        Box(
+            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+        ) {
+            SelectTrainLineContent(
+                trainLineUiState = TrainLineUiState(
+                    stopName = "Melbourne Central" + " Station",
+                        listOfDepartures = listOf(
+                            Departures(
+                                routeName = "Alamein",
+                                direction = "Toward Flinders",
+                                listOfDepartureTimes = listOf(
+                                    DepartureTimes("2pm"),
+                                    DepartureTimes("3pm"),
+                                    DepartureTimes("4pm")
+                                )
+                            ),
+                            Departures(
+                                routeName = "Alamein",
+                                direction = "Toward Alamein",
+                                listOfDepartureTimes = listOf(
+                                    DepartureTimes("2pm"),
+                                    DepartureTimes("3pm"),
+                                    DepartureTimes("4pm")
+                                )
+                            ),
+                            Departures(
+                                routeName = "Cranbourne",
+                                direction = "Toward Cranbourne",
+                                listOfDepartureTimes = listOf(
+                                    DepartureTimes("2pm"),
+                                    DepartureTimes("3pm"),
+                                    DepartureTimes("4pm")
+                                )
+                            )
+                        )
+                ), updateTrainLineScreenState = {"Alamein"}
+            )
+        }
+    }
+}
 
 @Preview
 @Composable
-fun TrainLineScreenPreview(){
-    SelectTrainLineScreen(
-        item = TrainLineUiState(),
-    )
+fun TrainLineScreenTwoPreview() {
+    PTVprojectTheme {
+        Box(
+            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+        ) {
+            SelectTrainLineContent(
+                trainLineUiState = TrainLineUiState(
+                    stopName = "Melbourne Central" + " Station",
+                    listOfDepartures = listOf(
+                        Departures(
+                            routeName = "Alamein",
+                            direction = "Toward Flinders",
+                            listOfDepartureTimes = listOf(
+                                DepartureTimes("2pm"),
+                                DepartureTimes("3pm"),
+                                DepartureTimes("4pm")
+                            )
+                        ),
+                        Departures(
+                            routeName = "Alamein",
+                            direction = "Toward Alamein",
+                            listOfDepartureTimes = listOf(
+                                DepartureTimes("2pm"),
+                                DepartureTimes("3pm"),
+                                DepartureTimes("4pm")
+                            )
+                        ),
+                        Departures(
+                            routeName = "Cranbourne",
+                            direction = "Toward Cranbourne",
+                            listOfDepartureTimes = listOf(
+                                DepartureTimes("2pm"),
+                                DepartureTimes("3pm"),
+                                DepartureTimes("4pm")
+                            )
+                        )
+                    )
+                ), updateTrainLineScreenState = {"Alamein"}
+            )
+        }
+    }
 }
+
+//@Preview
+//@Composable
+//fun AlertDialogPreview(){
+//    PTVprojectTheme {
+//        Box(
+//            modifier = Modifier.background(color = Color(0x96C99C))
+//        ) {
+//            ConfirmTrainLineDialog(
+//                onConfirm = { }
+//            )
+//        }
+//    }
+//}
+
+
+
+
+
 
