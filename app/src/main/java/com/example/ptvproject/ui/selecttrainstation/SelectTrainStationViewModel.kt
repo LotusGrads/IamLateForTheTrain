@@ -16,10 +16,12 @@ class SelectTrainStationViewModel : ViewModel() {
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
     fun generateListOfTrains(input: String) {
-        mutableTrainStateFlow.value = SelectTrainStationState.Loading
 
         viewModelScope.launch() {
             if (input.length > 2) {
+                if (mutableTrainStateFlow.value !is SelectTrainStationState.Success) {
+                    mutableTrainStateFlow.value = SelectTrainStationState.Loading
+                }
                 Log.d(TAG, "input: $input")
                 val response = PtvApi.retrofitService.getStation(input)
 

@@ -1,5 +1,7 @@
 package com.example.ptvproject.ui.selecttrainstation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -46,7 +48,7 @@ private fun SelectTrainStation(
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val input = remember { mutableStateOf("") }
@@ -76,7 +78,7 @@ private fun SelectTrainStation(
                 Text(text = "No train stations found :'(")
             }
             SelectTrainStationState.Loading -> {
-                CircularProgressBar()
+                CircularProgressIndicator()
             }
             SelectTrainStationState.Error -> {
                 Text(text = "FATAL ERROR!")
@@ -103,7 +105,7 @@ private fun SearchBar(
         shape = RoundedCornerShape(50),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(20.dp)
     )
@@ -116,7 +118,7 @@ private fun TrainStationCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .padding(10.dp)
             .clickable(onClick = onClick),
         elevation = 4.dp
@@ -133,6 +135,7 @@ private fun TrainStationCard(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TrainStationList(
     stationList: List<SelectTrainStationState.Station>,
@@ -142,13 +145,9 @@ private fun TrainStationList(
         items(stationList) { station ->
             TrainStationCard(
                 station = station,
-                onClick = { onTrainStationSelected(station.stopId) }
+                onClick = { onTrainStationSelected(station.stopId) },
+                modifier = Modifier.animateItemPlacement()
             )
         }
     }
-}
-
-@Composable
-private fun CircularProgressIndicator(modifier: Modifier = Modifier) {
-    CircularProgressIndicator()
 }

@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import java.util.concurrent.TimeUnit
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import retrofit2.Response as Response1
@@ -27,6 +28,9 @@ private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .client(
         OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
 //                    .addNetworkInterceptor(logger)
             .addInterceptor(
                 SignatureAddingInterceptor(
