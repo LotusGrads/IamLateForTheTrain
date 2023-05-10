@@ -26,9 +26,7 @@ import com.example.ptvproject.ui.selecttrainline.ConfirmTrainLineDialog as Confi
 
 @Composable
 fun SelectTrainLineScreen(
-    selectTrainLineViewModel: SelectTrainLineViewModel = viewModel(),
-    listOfDepartures: List<TrainLineUiState>,
-    modifier: Modifier = Modifier,
+    selectTrainLineViewModel: SelectTrainLineViewModel = viewModel()
 ) {
     val selectTrainLineUiState by selectTrainLineViewModel.uiState.collectAsState()
     //:: function reference

@@ -274,7 +274,7 @@ class PtvRepository(
                         PtvSearchResponse(
                             arrayListOf(
                                 Stops(
-                                    stopName = "Test Stop",
+                                    stopName = "Alamein",
                                     stopId = 10,
                                     routes = arrayListOf(
                                         Routes(

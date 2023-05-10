@@ -47,7 +47,7 @@ class SelectTrainStationViewModel : ViewModel() {
                                         Log.d(TAG, "valid station: ${stop.stopName}")
                                         var station = SelectTrainStationState.Station(
                                             stationName = stop.stopName,
-                                            stopId = stop.stopId
+                                            stopId = stop?.stopId?:0
                                         )
                                         add(station)
                                     }

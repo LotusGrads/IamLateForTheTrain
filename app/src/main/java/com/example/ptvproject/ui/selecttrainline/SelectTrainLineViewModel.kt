@@ -56,13 +56,17 @@ class SelectTrainLineViewModel(
             // Create an array of TrainLineUiState objects for each direction ID
             val arrayOfDeparturesWithDirection =
                 nextThreeDepartures.map { (directionId, departures) ->
-                    val response = PtvApi.PtvRepo.getDirections(directionId)
+                    val directionResponse = PtvApi.PtvRepo.getDirections(directionId)
 
                     val directionName =
                         //When you get response, get list of directions, take the first directionId, and get directionName for it
-                        response.body()?.directions?.first{it.directionId == directionId}?.directionName ?: ""
+                        directionResponse.body()?.directions?.first { it.directionId == directionId }?.directionName
+                            ?: ""
+                    val routeResponse = PtvApi.PtvRepo.getRoutes(departures.first().routeId)
+                    val routeName =
+                        routeResponse.body()?.route?.first()?.routeName ?: "Unknown Route"
                     Departures(
-                        routeName = "",
+                        routeName = routeName,
                         direction = directionName,
                         listOfDepartureTimes = departures.map { DepartureTimes(it.scheduledDepartureUtc) })
                 }
@@ -90,5 +94,6 @@ class SelectTrainLineViewModel(
         return "hi"
     }
 }
+
 
 
