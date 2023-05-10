@@ -15,43 +15,57 @@ class SelectTrainStationViewModel : ViewModel() {
         MutableStateFlow(SelectTrainStationState.NoSearchQuery)
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
-    fun searchInputUpdated(input: String) {
+    fun generateListOfTrains(input: String) {
+
         viewModelScope.launch() {
             if (input.length > 2) {
+                if (mutableTrainStateFlow.value !is SelectTrainStationState.Success) {
+                    mutableTrainStateFlow.value = SelectTrainStationState.Loading
+                }
                 Log.d(TAG, "input: $input")
                 val response = PtvApi.retrofitService.getStation(input)
-                val successBody = response.body()?.stops
 
-                if (successBody != null) {
-                    if (successBody.isEmpty()) {
-                        mutableTrainStateFlow.emit(
-                            SelectTrainStationState.NoTrainStationsFound
-                        )
-                        Log.d(TAG, "No train stations found")
-                    } else {
-                        Log.d(TAG, "stations founds")
-                        val trainStationList: List<SelectTrainStationState.Station>
-                        var station: SelectTrainStationState.Station
+                if (response.isSuccessful) {
+                    val successBody = response.body()?.stops
 
-                        trainStationList = buildList {
-                            for (stop in successBody) {
-                                if (stop.routeType == 0 && stop.stopName.contains(input, ignoreCase = true)) {
-                                    Log.d(TAG, "valid station: ${stop.stopName}")
-                                    station = SelectTrainStationState.Station(
-                                        stationName = stop.stopName,
-                                        stopId = stop.stopId
-                                    )
-                                    add(station)
+                    if (successBody != null) {
+                        if (successBody.isEmpty()) {
+                            mutableTrainStateFlow.emit(
+                                SelectTrainStationState.NoTrainStationsFound
+                            )
+                            Log.d(TAG, "No train stations found")
+                        } else {
+
+
+                            val trainStationList = buildList {
+                                for (stop in successBody) {
+                                    if (stop.routeType == 0 && stop.stopName.contains(
+                                            input,
+                                            ignoreCase = true
+                                        )
+                                    ) {
+                                        Log.d(TAG, "valid station: ${stop.stopName}")
+                                        var station = SelectTrainStationState.Station(
+                                            stationName = stop.stopName,
+                                            stopId = stop.stopId
+                                        )
+                                        add(station)
+                                    }
                                 }
                             }
-                        }
+                            Log.d(TAG, "${trainStationList.size} stations founds")
 
-                        mutableTrainStateFlow.emit(
-                            SelectTrainStationState.ListOfStations(
-                                listOfStations = trainStationList
+                            mutableTrainStateFlow.emit(
+                                SelectTrainStationState.Success(
+                                    listOfStations = trainStationList
+                                )
                             )
-                        )
+                        }
                     }
+                } else {
+                    mutableTrainStateFlow.emit(
+                        SelectTrainStationState.Error
+                    )
                 }
             } else {
                 mutableTrainStateFlow.emit(
