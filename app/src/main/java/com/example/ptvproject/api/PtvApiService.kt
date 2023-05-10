@@ -340,15 +340,7 @@ class PtvRepository(
                 com.example.ptvproject.api.fakeDataType.failure ->
                     Response.success(
                         PtvRoutesResponse(
-                            arrayListOf(
                                 Route(
-                                    routeServiceStatus =
-                                    listOf(
-                                        RouteServiceStatus(
-                                            description = "",
-                                            timestamp = ""
-                                        )
-                                    ),
                                     routeType = 0,
                                     routeId = 0,
                                     routeName = "",
@@ -356,13 +348,6 @@ class PtvRepository(
                                     routeGtfsId = "",
                                     geopath = listOf("Hey", "Hi")
                                 )
-                            ),
-                            arrayListOf(
-                                Status(
-                                    version = "",
-                                    health = 0
-                                )
-                            )
                         )
                     )
                 com.example.ptvproject.api.fakeDataType.multipleItems,
@@ -370,15 +355,7 @@ class PtvRepository(
                 com.example.ptvproject.api.fakeDataType.success ->
                     Response.success(
                         PtvRoutesResponse(
-                            arrayListOf(
                                 Route(
-                                    routeServiceStatus =
-                                    listOf(
-                                        RouteServiceStatus(
-                                            description = "Minor Delays",
-                                            timestamp = "2023-05-09T01:47:13.2960048+00:00"
-                                        )
-                                    ),
                                     routeType = 0,
                                     routeId = 7,
                                     routeName = "Glen Waverley",
@@ -386,13 +363,6 @@ class PtvRepository(
                                     routeGtfsId = "2-GLW",
                                     geopath = listOf("[]")
                                 )
-                            ),
-                            arrayListOf(
-                                Status(
-                                    version = "3.0",
-                                    health = 1
-                                )
-                            )
                         )
                     )
 
@@ -425,6 +395,6 @@ class PtvRepository(
 
 object PtvApi {
     val PtvRepo: PtvRepository by lazy {
-        PtvRepository(true)
+        PtvRepository(false)
     }
 }

@@ -64,7 +64,7 @@ class SelectTrainLineViewModel(
                             ?: ""
                     val routeResponse = PtvApi.PtvRepo.getRoutes(departures.first().routeId)
                     val routeName =
-                        routeResponse.body()?.route?.first()?.routeName ?: "Unknown Route"
+                        routeResponse.body()?.route?.routeName ?: "Unknown Route"
                     Departures(
                         routeName = routeName,
                         direction = directionName,
