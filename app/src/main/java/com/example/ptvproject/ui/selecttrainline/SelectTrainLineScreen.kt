@@ -1,7 +1,6 @@
 package com.example.ptvproject.ui.selecttrainline
 
 
-import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,11 +35,11 @@ fun SelectTrainLineScreen(
 
     SelectTrainLineContent(
         trainLineUiState = selectTrainLineUiState,
-        updateTrainLineScreenState =  selectTrainLineViewModel::updateTrainLineScreenState
+        updateTrainLineScreenState = selectTrainLineViewModel::updateTrainLineScreenState
     )
     if (selectTrainLineUiState.isTrainLineConfirmed) {
         ConfirmTrainLineDialog(
-            onConfirm = { selectTrainLineViewModel.updateTrainLineScreenState()})
+            onConfirm = { selectTrainLineViewModel.updateTrainLineScreenState() })
     }
 
 }
@@ -52,50 +50,55 @@ fun SelectTrainLineContent(
     trainLineUiState: TrainLineUiState,
     updateTrainLineScreenState: () -> String,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(modifier = modifier.fillMaxWidth()) {
-            Text(
-                text = trainLineUiState.stopName,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
-            Spacer(modifier = Modifier.width(36.dp))
-            Image(
-                modifier = modifier
-                    .size(40.dp)
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.End),
-                contentDescription = null,
-                painter = painterResource(id = R.drawable.logo_simple)
-            )
-        }
-        if (trainLineUiState.listOfDepartures.isNotEmpty()) {
-            LazyColumn(
-                modifier = modifier
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-            ) {
-                items(
-                    trainLineUiState.listOfDepartures
-                ) { item ->
-                    SelectTrainLineItemRow(
-                        item = item,
-                        selectedTrainLine = updateTrainLineScreenState(),
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+    Card (
+        modifier = Modifier
+            .background(color = Color(0xFFE1FFD7))
+            .border(width = 1.dp, color = Color(0xFF317B3A))
+    ){
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Row(modifier = modifier.fillMaxWidth()) {
+                Text(
+                    text = trainLineUiState.stopName,
+                    style = MaterialTheme.typography.h2
+                )
+                Spacer(modifier = Modifier.width(36.dp))
+                Image(
+                    modifier = modifier
+                        .size(40.dp)
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.End),
+                    contentDescription = null,
+                    painter = painterResource(id = R.drawable.logo_simple)
+                )
             }
-        } else {
-            Text(
-                text = "No upcoming train departures for this train station.",
-                modifier = Modifier
-                    .padding(vertical = 16.dp, horizontal = 12.dp)
-                    .border(width = 1.dp, color = Color(0xFF317B3A)),
-                fontSize = 18.sp
-            )
+            if (trainLineUiState.listOfDepartures.isNotEmpty()) {
+                LazyColumn(
+                    modifier = modifier
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                ) {
+                    items(
+                        trainLineUiState.listOfDepartures
+                    ) { item ->
+                        SelectTrainLineItemRow(
+                            item = item,
+                            selectedTrainLine = updateTrainLineScreenState(),
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+            } else {
+                Text(
+                    text = "No upcoming train departures for this train station.",
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier
+                        .padding(vertical = 16.dp, horizontal = 12.dp)
+                        .border(width = 1.dp, color = Color(0xFF317B3A))
+                )
+            }
         }
     }
 }
@@ -122,35 +125,39 @@ fun SelectTrainLineItemRow(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp, horizontal = 12.dp)
         ) {
-            Row{
+            Row {
                 Text(
                     text = item.routeName,
-                    fontWeight = FontWeight.Bold
-                    )
+                    style = MaterialTheme.typography.body2
+                )
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentWidth(Alignment.End),
-                    text = item.direction
+                    text = item.direction,
+                    style = MaterialTheme.typography.body2
                 )
             }
             Column {
-                    item.listOfDepartureTimes.forEach {
-                        Text(text = "Leaving at: " + it.timeOfDeparture)
-                    }
+                item.listOfDepartureTimes.forEach {
+                    Text(
+                        text = "Leaving at: " + it.timeOfDeparture,
+                        style = MaterialTheme.typography.body1
+                    )
                 }
             }
         }
     }
+}
 
 @Composable
 private fun ConfirmTrainLineDialog(
     onConfirm: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     //val activity = (LocalContext.current as Activity)
     Box(
-        modifier = Modifier.background(color = Color(0xFFBDF2BE)),
+        modifier = Modifier.background(color = Color(0xFFE1FFD7)),
     ) {
         AlertDialog(
             onDismissRequest = {
@@ -159,10 +166,14 @@ private fun ConfirmTrainLineDialog(
             title = {
                 Text(
                     text = "You have selected a train line!",
-                    fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.body2
+                )
             },
             text = {
-                Text("Click continue to receive notifications of your timeliness.")
+                Text(
+                    text = "Click continue to receive notifications of your timeliness.",
+                    style = MaterialTheme.typography.body1
+                )
             },
             confirmButton = {
                 Button(
@@ -171,9 +182,13 @@ private fun ConfirmTrainLineDialog(
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color(0xFF317B3A),
-                        contentColor = Color.White)
+                        contentColor = Color.White
+                    )
                 ) {
-                    Text("Confirm")
+                    Text(
+                        text = "Confirm",
+                        style = MaterialTheme.typography.body2
+                    )
                 }
             },
             dismissButton = {
@@ -183,9 +198,13 @@ private fun ConfirmTrainLineDialog(
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color(0xFF317B3A),
-                        contentColor = Color.White)
+                        contentColor = Color.White
+                    )
                 ) {
-                    Text("Back")
+                    Text(
+                        text = "Back",
+                        style = MaterialTheme.typography.body2
+                    )
                 }
             }
         )
@@ -198,41 +217,41 @@ private fun ConfirmTrainLineDialog(
 fun TrainLineScreenLotsOfDeparturesPreview() {
     PTVprojectTheme {
         Box(
-            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+            modifier = Modifier.background(color = Color(0xFFE1FFD7))
         ) {
             SelectTrainLineContent(
                 trainLineUiState = TrainLineUiState(
                     stopName = "Melbourne Central" + " Station",
-                        listOfDepartures = listOf(
-                            Departures(
-                                routeName = "Alamein",
-                                direction = "Toward Flinders",
-                                listOfDepartureTimes = listOf(
-                                    DepartureTimes("2pm"),
-                                    DepartureTimes("3pm"),
-                                    DepartureTimes("4pm")
-                                )
-                            ),
-                            Departures(
-                                routeName = "Alamein",
-                                direction = "Toward Alamein",
-                                listOfDepartureTimes = listOf(
-                                    DepartureTimes("2pm"),
-                                    DepartureTimes("3pm"),
-                                    DepartureTimes("4pm")
-                                )
-                            ),
-                            Departures(
-                                routeName = "Cranbourne",
-                                direction = "Toward Cranbourne",
-                                listOfDepartureTimes = listOf(
-                                    DepartureTimes("2pm"),
-                                    DepartureTimes("3pm"),
-                                    DepartureTimes("4pm")
-                                )
+                    listOfDepartures = listOf(
+                        Departures(
+                            routeName = "Alamein",
+                            direction = "Toward Flinders",
+                            listOfDepartureTimes = listOf(
+                                DepartureTimes("2pm"),
+                                DepartureTimes("3pm"),
+                                DepartureTimes("4pm")
+                            )
+                        ),
+                        Departures(
+                            routeName = "Alamein",
+                            direction = "Toward Alamein",
+                            listOfDepartureTimes = listOf(
+                                DepartureTimes("2pm"),
+                                DepartureTimes("3pm"),
+                                DepartureTimes("4pm")
+                            )
+                        ),
+                        Departures(
+                            routeName = "Cranbourne",
+                            direction = "Toward Cranbourne",
+                            listOfDepartureTimes = listOf(
+                                DepartureTimes("2pm"),
+                                DepartureTimes("3pm"),
+                                DepartureTimes("4pm")
                             )
                         )
-                ), updateTrainLineScreenState = {"Alamein"}
+                    )
+                ), updateTrainLineScreenState = { "Alamein" }
             )
         }
     }
@@ -243,7 +262,7 @@ fun TrainLineScreenLotsOfDeparturesPreview() {
 fun TrainLineScreenTwoPreview() {
     PTVprojectTheme {
         Box(
-            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+            modifier = Modifier.background(color = Color(0xFFE1FFD7))
         ) {
             SelectTrainLineContent(
                 trainLineUiState = TrainLineUiState(
@@ -259,7 +278,7 @@ fun TrainLineScreenTwoPreview() {
                             )
                         )
                     )
-                ), updateTrainLineScreenState = {"Alamein"}
+                ), updateTrainLineScreenState = { "Alamein" }
             )
         }
     }
@@ -270,14 +289,14 @@ fun TrainLineScreenTwoPreview() {
 fun TrainLineScreenNoDeparturesPreview() {
     PTVprojectTheme {
         Box(
-            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+            modifier = Modifier.background(color = Color(0xFFE1FFD7))
         ) {
             SelectTrainLineContent(
                 trainLineUiState = TrainLineUiState(
                     stopName = "Melbourne Central" + " Station",
                     listOfDepartures = listOf(
                     )
-                ), updateTrainLineScreenState = {"Alamein"}
+                ), updateTrainLineScreenState = { "Alamein" }
             )
         }
     }
@@ -288,7 +307,7 @@ fun TrainLineScreenNoDeparturesPreview() {
 fun TrainLineScreenPreview() {
     PTVprojectTheme {
         Box(
-            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+            modifier = Modifier.background(color = Color(0xFFE1FFD7))
         ) {
             SelectTrainLineContent(
                 trainLineUiState = TrainLineUiState(
@@ -367,7 +386,7 @@ fun TrainLineScreenPreview() {
                             )
                         )
                     )
-                ), updateTrainLineScreenState = {"Alamein"}
+                ), updateTrainLineScreenState = { "Alamein" }
             )
         }
     }
@@ -375,10 +394,10 @@ fun TrainLineScreenPreview() {
 
 @Preview
 @Composable
-fun AlertDialogPreview(){
+fun AlertDialogPreview() {
     PTVprojectTheme {
         Box(
-            modifier = Modifier.background(color = Color(0xFFBDF2BE))
+            modifier = Modifier.background(color = Color(0xFFE1FFD7))
         ) {
             ConfirmTrainLineDialog(
                 onConfirm = {},

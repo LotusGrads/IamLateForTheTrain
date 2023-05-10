@@ -3,16 +3,16 @@ package com.example.ptvproject.model
 import com.google.gson.annotations.SerializedName
 
 
-data class PtvRoutesResponse (
+data class PtvRoutesResponse(
 
-    @SerializedName("route") var route : Route,
-    @SerializedName("status") var status : Status
+    @SerializedName("route") var route: List<Route>,
+    @SerializedName("status") var status : List<Status>
 
 )
 
 data class Route (
 
-    @SerializedName("route_service_status") var routeServiceStatus : RouteServiceStatus,
+    @SerializedName("route_service_status") var routeServiceStatus : List<RouteServiceStatus>,
     @SerializedName("route_type") var routeType : Int,
     @SerializedName("route_id") var routeId : Int,
     @SerializedName("route_name") var routeName : String,

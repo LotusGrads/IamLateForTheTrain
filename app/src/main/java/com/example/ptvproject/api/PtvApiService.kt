@@ -1,9 +1,7 @@
 package com.example.ptvproject.api
 
 import android.util.Log
-import com.example.ptvproject.model.PtvDeparturesResponse
-import com.example.ptvproject.model.PtvRoutesResponse
-import com.example.ptvproject.model.PtvSearchResponse
+import com.example.ptvproject.model.*
 import okhttp3.OkHttpClient
 import okhttp3.Interceptor
 import okhttp3.Response as OkHttpResponse
@@ -70,7 +68,12 @@ class SignatureAddingInterceptor(
         return chain.proceed(newRequest)
     }
 
-    private fun buildTTAPIURL(baseURL: String, privateKey: String, uri: String, developerId: Int): String {
+    private fun buildTTAPIURL(
+        baseURL: String,
+        privateKey: String,
+        uri: String,
+        developerId: Int,
+    ): String {
         val HMAC_SHA1_ALGORITHM = "HmacSHA1"
         val uriWithDeveloperID = StringBuilder(uri).append(if (uri.contains("?")) "&" else "?")
             .append("devid=$developerId")
@@ -104,16 +107,324 @@ interface PtvApiService {
     suspend fun getStation(@Path("search") searchString: String): Response<PtvSearchResponse>
 
     @GET("/v3/departures/route_type/{route_type}/stop/{stop_id}")
-    suspend fun getDepartures(@Path("route_type") routeType: Int = 0, @Path("stop_id") stopId: Int): Response<PtvDeparturesResponse>
+    suspend fun getDepartures(
+        @Path("route_type") routeType: Int = 0,
+        @Path("stop_id") stopId: Int,
+    ): Response<PtvDeparturesResponse>
+
+    @GET("/v3/directions/{direction_id}")
+    suspend fun getDirections(@Path("direction_id") directionId: Int): Response<PtvDirectionsResponse>
 
     @GET("/v3/routes/{route_id}")
     suspend fun getRoutes(@Path("route_id") routeId: Int): Response<PtvRoutesResponse>
 
 }
 
+sealed class fakeDataType {
+    object success : fakeDataType()
+    object failure : fakeDataType()
+    object multipleItems : fakeDataType()
 
-object PtvApi {
+}
+
+
+class PtvRepository(
+    val userDemoData: Boolean = false,
+) {
     val retrofitService: PtvApiService by lazy {
         retrofit.create(PtvApiService::class.java)
+    }
+
+    suspend fun getStation(
+        searchString: String,
+        fakeDataType: fakeDataType = com.example.ptvproject.api.fakeDataType.success,
+    ): Response<PtvSearchResponse> {
+        if (userDemoData)
+            return when (fakeDataType) {
+                com.example.ptvproject.api.fakeDataType.failure ->
+                    Response.success(
+                        PtvSearchResponse(
+                            arrayListOf(
+                                Stops(
+                                    stopName = "",
+                                    stopId = null,
+                                    routes = emptyList(),
+                                    routeType = null
+                                )
+                            )
+                        )
+                    )
+                com.example.ptvproject.api.fakeDataType.multipleItems ->
+                    Response.success(
+                        PtvSearchResponse(
+                            arrayListOf(
+                                Stops(
+                                    stopName = "Richmond Station",
+                                    stopId = 1162,
+                                    routes = arrayListOf(
+                                        Routes(
+                                            routeName = "Alamein",
+                                            routeId = 1,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Belgrave",
+                                            routeId = 2,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Crnabourne",
+                                            routeId = 4,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Frankston",
+                                            routeId = 6,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Glen Waverley",
+                                            routeId = 7,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Lilydale",
+                                            routeId = 9,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Pakenham",
+                                            routeId = 11,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Sandringham",
+                                            routeId = 12,
+                                            routeType = 0
+                                        )
+                                    ),
+                                    routeType = 0
+                                ),
+                                Stops(
+                                    stopName = "North Richmond Station",
+                                    stopId = 1145,
+                                    routes = arrayListOf(
+                                        Routes(
+                                            routeName = "Mernda",
+                                            routeId = 5,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Hurstbridge",
+                                            routeId = 8,
+                                            routeType = 0
+                                        )
+                                    ),
+                                    routeType = 0
+                                ),
+                                Stops(
+                                    stopName = "East Richmond Station",
+                                    stopId = 1059,
+                                    routes = arrayListOf(
+                                        Routes(
+                                            routeName = "Alamein",
+                                            routeId = 1,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Belgrave",
+                                            routeId = 2,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Glen Waverley",
+                                            routeId = 7,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Lilydale",
+                                            routeId = 9,
+                                            routeType = 0
+                                        )
+                                    ),
+                                    routeType = 0
+                                ),
+                                Stops(
+                                    stopName = "West Richmond Station",
+                                    stopId = 1207,
+                                    routes = arrayListOf(
+                                        Routes(
+                                            routeName = "Mernda",
+                                            routeId = 5,
+                                            routeType = 0
+                                        ),
+                                        Routes(
+                                            routeName = "Hurstbridge",
+                                            routeId = 8,
+                                            routeType = 0
+                                        )
+                                    ),
+                                    routeType = 0
+                                )
+                            )
+                        )
+                    )
+                com.example.ptvproject.api.fakeDataType.success ->
+                    Response.success(
+                        PtvSearchResponse(
+                            arrayListOf(
+                                Stops(
+                                    stopName = "Test Stop",
+                                    stopId = 10,
+                                    routes = arrayListOf(
+                                        Routes(
+                                            routeName = "Alamein",
+                                            routeId = 2,
+                                            routeType = 0
+                                        )
+                                    ),
+                                    routeType = 0
+                                )
+                            )
+                        )
+                    )
+            }
+        else {
+            return retrofitService.getStation(searchString)
+        }
+    }
+
+    suspend fun getDepartures(
+        routeType: Int,
+        stopId: Int,
+        fakeDataType: fakeDataType = com.example.ptvproject.api.fakeDataType.success,
+    ): Response<PtvDeparturesResponse> {
+        if (userDemoData)
+            return when (fakeDataType) {
+                com.example.ptvproject.api.fakeDataType.failure -> TODO()
+                com.example.ptvproject.api.fakeDataType.multipleItems -> TODO()
+                com.example.ptvproject.api.fakeDataType.success ->
+                    Response.success(
+                        PtvDeparturesResponse(
+                            arrayListOf(
+                                Departures(
+                                    stopId = 10,
+                                    routeId = 10,
+                                    runId = 10,
+                                    runRef = "",
+                                    directionId = 10,
+                                    disruptionIds = listOf(1, 2),
+                                    scheduledDepartureUtc = "2pm",
+                                    estimatedDepartureUtc = "3pm",
+                                    atPlatform = true,
+                                    platformNumber = "Seven",
+                                    flags = "",
+                                    departureSequence = 1
+                                )
+                            ),
+
+                        )
+                    )
+            }
+        else {
+            return retrofitService.getDepartures(routeType, stopId)
+        }
+    }
+
+    suspend fun getRoutes(
+        routeId: Int,
+        fakeDataType: fakeDataType = com.example.ptvproject.api.fakeDataType.success,
+    ): Response<PtvRoutesResponse> {
+        if (userDemoData)
+            return when (fakeDataType) {
+                com.example.ptvproject.api.fakeDataType.failure ->
+                    Response.success(
+                        PtvRoutesResponse(
+                            arrayListOf(
+                                Route(
+                                    routeServiceStatus =
+                                    listOf(
+                                        RouteServiceStatus(
+                                            description = "",
+                                            timestamp = ""
+                                        )
+                                    ),
+                                    routeType = 0,
+                                    routeId = 0,
+                                    routeName = "",
+                                    routeNumber = "",
+                                    routeGtfsId = "",
+                                    geopath = listOf("Hey", "Hi")
+                                )
+                            ),
+                            arrayListOf(
+                                Status(
+                                    version = "",
+                                    health = 0
+                                )
+                            )
+                        )
+                    )
+                com.example.ptvproject.api.fakeDataType.multipleItems,
+                -> TODO()
+                com.example.ptvproject.api.fakeDataType.success ->
+                    Response.success(
+                        PtvRoutesResponse(
+                            arrayListOf(
+                                Route(
+                                    routeServiceStatus =
+                                    listOf(
+                                        RouteServiceStatus(
+                                            description = "Minor Delays",
+                                            timestamp = "2023-05-09T01:47:13.2960048+00:00"
+                                        )
+                                    ),
+                                    routeType = 0,
+                                    routeId = 7,
+                                    routeName = "Glen Waverley",
+                                    routeNumber = "",
+                                    routeGtfsId = "2-GLW",
+                                    geopath = listOf("[]")
+                                )
+                            ),
+                            arrayListOf(
+                                Status(
+                                    version = "3.0",
+                                    health = 1
+                                )
+                            )
+                        )
+                    )
+
+            }
+        else {
+            return retrofitService.getRoutes(routeId)
+        }
+    }
+
+    suspend fun getDirections(directionId: Int): Response<PtvDirectionsResponse> {
+        if (userDemoData)
+            return Response.success(
+                PtvDirectionsResponse(
+                    listOf(
+                        Directions(
+                            "Outbound toward city",
+                            directionId = directionId,
+                            "Outbound",
+                            routeId = 1,
+                            routeType = 0
+                        )
+                    )
+                )
+            )
+        else {
+
+        return retrofitService.getDirections(directionId)}
+    }
+}
+
+object PtvApi {
+    val PtvRepo: PtvRepository by lazy {
+        PtvRepository(true)
     }
 }

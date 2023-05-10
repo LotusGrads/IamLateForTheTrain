@@ -27,16 +27,14 @@ class SelectTrainLineViewModel(
     private lateinit var validTrainLine: String
 
     init {
-       showNextThreeDeparturesForEachDirection()
+        showNextThreeDeparturesForEachDirection()
     }
-
-
 
 
     //Show next three departures for each directionId
     fun showNextThreeDeparturesForEachDirection() {
         viewModelScope.launch() {
-            val response = PtvApi.retrofitService.getDepartures(stopId = station.stopId)
+            val response = PtvApi.PtvRepo.getDepartures(routeType = 0, stopId = station.stopId)
 
             //Return an emptyList of departures to allow for code to be executed and sorted
             val successBody = response.body()?.departures ?: emptyList()
@@ -58,13 +56,24 @@ class SelectTrainLineViewModel(
             // Create an array of TrainLineUiState objects for each direction ID
             val arrayOfDeparturesWithDirection =
                 nextThreeDepartures.map { (directionId, departures) ->
+                    val response = PtvApi.PtvRepo.getDirections(directionId)
+
                     val directionName =
-                        response.body()?.directions?.get(directionId)?.directionName ?: ""
-                        Departures (routeName = "", direction = directionName, listOfDepartureTimes = departures.map {DepartureTimes(it.scheduledDepartureUtc)})
+                        //When you get response, get list of directions, take the first directionId, and get directionName for it
+                        response.body()?.directions?.first{it.directionId == directionId}?.directionName ?: ""
+                    Departures(
+                        routeName = "",
+                        direction = directionName,
+                        listOfDepartureTimes = departures.map { DepartureTimes(it.scheduledDepartureUtc) })
                 }
 
-             //Display a list of departures for the station
-            _uiState.emit(TrainLineUiState(stopName = station.stationName, listOfDepartures = arrayOfDeparturesWithDirection))
+            //Display a list of departures for the station
+            _uiState.emit(
+                TrainLineUiState(
+                    stopName = station.stationName,
+                    listOfDepartures = arrayOfDeparturesWithDirection
+                )
+            )
         }
     }
 
@@ -75,23 +84,11 @@ class SelectTrainLineViewModel(
 
     //Update the user's train line selection
 
-    fun updateTrainLineScreenState() : String {
+    fun updateTrainLineScreenState(): String {
         //if train line is confirmed by user clicking continue on dialog, go to next screen
         //else, current state is normal
         return "hi"
     }
-
-
-//    fun onTrainLineSelected(validTrainLine: String) {
-//        if (selectedTrainLine == validTrainLine) {
-//            showConfirmTrainLineDialog()
-//            //update dialog state
-//        } else {
-//            // Show an error?
-//        }
-//    }
-
-
 }
 
 
