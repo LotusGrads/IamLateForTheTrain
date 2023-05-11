@@ -14,10 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ptvproject.R
 import com.example.ptvproject.ui.theme.PTVprojectTheme
@@ -26,7 +24,8 @@ import com.example.ptvproject.ui.selecttrainline.ConfirmTrainLineDialog as Confi
 
 @Composable
 fun SelectTrainLineScreen(
-    selectTrainLineViewModel: SelectTrainLineViewModel = viewModel()
+    selectTrainLineViewModel: SelectTrainLineViewModel = viewModel(),
+    //onTrainLineSelected: (departureTime: ZonedDateTime, stationName: String, trainLine: String, direction: String) -> Unit
 ) {
     val selectTrainLineUiState by selectTrainLineViewModel.uiState.collectAsState()
     //:: function reference
@@ -35,9 +34,10 @@ fun SelectTrainLineScreen(
         trainLineUiState = selectTrainLineUiState,
         updateTrainLineScreenState = selectTrainLineViewModel::updateTrainLineScreenState
     )
-    if (selectTrainLineUiState.isTrainLineConfirmed) {
+    if (selectTrainLineUiState.isDepartureTimeSelected) {
         ConfirmTrainLineDialog(
-            onConfirm = { selectTrainLineViewModel.updateTrainLineScreenState() })
+            onConfirm = { }
+            )
     }
 
 }
@@ -48,11 +48,11 @@ fun SelectTrainLineContent(
     trainLineUiState: TrainLineUiState,
     updateTrainLineScreenState: () -> String,
 ) {
-    Card (
+    Card(
         modifier = Modifier
             .background(color = Color(0xFFE1FFD7))
             .border(width = 1.dp, color = Color(0xFF317B3A))
-    ){
+    ) {
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -83,7 +83,8 @@ fun SelectTrainLineContent(
                     ) { item ->
                         SelectTrainLineItemRow(
                             item = item,
-                            selectedTrainLine = updateTrainLineScreenState(),
+                            selectedDepartureTime = updateTrainLineScreenState(),
+                            showAlertDialog = showAlertDialog
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -105,17 +106,13 @@ fun SelectTrainLineContent(
 @Composable
 fun SelectTrainLineItemRow(
     item: Departures,
-    selectedTrainLine: String,
+    selectedDepartureTime: String,
+    showAlertDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = Modifier
-            .border(width = 1.dp, color = Color(0xFF317B3A))
-            .selectable(
-                selected = selectedTrainLine == item.routeName,
-                onClick = {
-                }
-            ),
+            .border(width = 1.dp, color = Color(0xFF317B3A)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -135,13 +132,21 @@ fun SelectTrainLineItemRow(
                     text = item.direction,
                     style = MaterialTheme.typography.body2
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
             Column {
                 item.listOfDepartureTimes.forEach {
                     Text(
                         text = "Leaving at: " + it.timeOfDeparture,
-                        style = MaterialTheme.typography.body1
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .border(width = 1.dp, color = Color(0xFF317B3A))
+                            .selectable(
+                                selected = selectedDepartureTime == it.timeOfDeparture,
+                                onClick = showAlertDialog
+                            )
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
@@ -153,60 +158,56 @@ private fun ConfirmTrainLineDialog(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    //val activity = (LocalContext.current as Activity)
-    Box(
-        modifier = Modifier.background(color = Color(0xFFE1FFD7)),
-    ) {
-        AlertDialog(
-            onDismissRequest = {
-                //Dismiss dialog when user clicks outside dialog
-            },
-            title = {
+    AlertDialog(
+        onDismissRequest = {
+            //Dismiss dialog when user clicks outside dialog
+        },
+        title = {
+            Text(
+                text = "You have selected a train line!",
+                style = MaterialTheme.typography.body2
+            )
+        },
+        text = {
+            Text(
+                text = "Click continue to receive notifications of your timeliness.",
+                style = MaterialTheme.typography.body1
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    //TODO: parse in > schedule departure time, stop name, train line and direction
+                    onConfirm()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFF317B3A),
+                    contentColor = Color.White
+                )
+            ) {
                 Text(
-                    text = "You have selected a train line!",
+                    text = "Confirm",
                     style = MaterialTheme.typography.body2
                 )
-            },
-            text = {
-                Text(
-                    text = "Click continue to receive notifications of your timeliness.",
-                    style = MaterialTheme.typography.body1
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onConfirm
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFF317B3A),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(
-                        text = "Confirm",
-                        style = MaterialTheme.typography.body2
-                    )
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        //  activity.finish()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFF317B3A),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(
-                        text = "Back",
-                        style = MaterialTheme.typography.body2
-                    )
-                }
             }
-        )
-    }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    //  activity.finish()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFF317B3A),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Back",
+                    style = MaterialTheme.typography.body2
+                )
+            }
+        }
+    )
 }
 
 

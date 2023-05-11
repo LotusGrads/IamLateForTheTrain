@@ -2,6 +2,7 @@ package com.example.ptvproject
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ptvproject.destinations.NotificationDestination
 import com.example.ptvproject.destinations.SelectTrainLineDestination
 import com.example.ptvproject.ui.notification.Notification
 import com.example.ptvproject.ui.notification.NotificationViewModel
@@ -27,7 +28,16 @@ fun SelectTrainStation(navigator: DestinationsNavigator) {
 @Destination
 @Composable
 fun SelectTrainLine(navigator: DestinationsNavigator, stationName: String, stopId: Int) {
-    SelectTrainLineScreen(selectTrainLineViewModel = SelectTrainLineViewModel(station = SelectTrainStationState.Station(stationName, stopId)))
+    SelectTrainLineScreen(
+        selectTrainLineViewModel = SelectTrainLineViewModel(
+            station = SelectTrainStationState.Station(
+                stationName,
+                stopId
+            )),
+//            onTrainLineSelected = { timeOfDeparture, stationName ->
+//                navigator.navigate(NotificationDestination(timeOfDeparture = timeOfDeparture))
+//          }
+    )
 }
 
 @Destination

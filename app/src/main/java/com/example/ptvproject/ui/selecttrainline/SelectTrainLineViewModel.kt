@@ -24,7 +24,6 @@ class SelectTrainLineViewModel(
 
     var selectedTrainLine by mutableStateOf("")
 
-    private lateinit var validTrainLine: String
 
     init {
         showNextThreeDeparturesForEachDirection()
@@ -89,9 +88,19 @@ class SelectTrainLineViewModel(
     //Update the user's train line selection
 
     fun updateTrainLineScreenState(): String {
+
         //if train line is confirmed by user clicking continue on dialog, go to next screen
         //else, current state is normal
         return "hi"
+    }
+
+
+    fun showAlertDialog() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isDepartureTimeSelected = true
+            )
+        }
     }
 }
 
