@@ -43,5 +43,5 @@ fun SelectTrainLine(navigator: DestinationsNavigator, stationName: String, stopI
 @Destination
 @Composable
 fun Notification() {
-    Notification(vM = NotificationViewModel(stationId = 1, trainLineId = 1))
+//    Notification(vM = NotificationViewModel(stationId = 1, trainLineId = 1))
 }
