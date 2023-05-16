@@ -29,6 +29,11 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp
     ),
+    h3 = TextStyle(
+        fontFamily = PlexSansCondensedRegular,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
     body1 = TextStyle(
         fontFamily = PlexSansCondensedRegular,
         fontWeight = FontWeight.Normal,
@@ -38,5 +43,5 @@ val Typography = Typography(
         fontFamily = PlexSansCondensedBold,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp
-    ),
+    )
 )
