@@ -1,21 +1,236 @@
 package com.example.ptvproject.ui.notification
 
+import android.annotation.SuppressLint
+import android.content.res.Configuration
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun TrainInfoCard(
-    modifier: Modifier = Modifier,
-    userTrainInfo: NotificationViewModel) {
+fun Notification(viewModel: NotificationViewModel) {
+    val state by viewModel.notificationsUiState.collectAsState()
+    NotificationScreen(state = state)
+}
 
-    Text(
-        text = userTrainInfo
+@SuppressLint("SuspiciousIndentation")
+@Composable
+private fun NotificationScreen(
+    state: NotificationsUiState,
+) {
+    val userInfo = state.userInfo
+    val onTime = userInfo.onTime
+    val estimatedArrivalTime = userInfo.estimatedArrivalTime
+
+    val trainInfo = state.trainInfo
+    val stationName = trainInfo.stationName
+    val departureTime = trainInfo.departureTime
+    val lineName = trainInfo.lineName
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(intrinsicSize = IntrinsicSize.Min)
+
+    ) {
+        Column(
+            modifier = Modifier
+                .widthIn(100.dp, 400.dp)
+                .padding(
+                    top = 70.dp,
+                    start = 45.dp,
+                    end = 45.dp
+                )
+        ) {
+            DisplayUserOnTime(onTime)
+
+            DisplayEstimatedArrivalTime(estimatedArrivalTime)
+
+            DividerLine()
+
+            TrainInfoBlock(stationName, lineName, departureTime)
+        }
+    }
+}
+
+@Composable
+private fun DisplayUserOnTime(onTime: Boolean) {
+    Column(
+
+    ) {
+        if (onTime) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Canvas(
+                    modifier = Modifier
+                        .size(size = 25.dp)
+                ) {
+                    drawCircle(
+                        color = Color(0xFF5c940d),
+                    )
+                }
+                Text(
+                    text = "On time! :)",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 45.sp,
+                    color = Color(0xFF5c940d)
+                )
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Canvas(
+                    modifier = Modifier
+                        .size(size = 25.dp)
+                ) {
+                    drawCircle(
+                        color = Color(0xFFd9480f),
+                    )
+                }
+                Text(
+                    text = "Walk faster!",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 45.sp,
+                    color = Color(0xFFd9480f),
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DisplayEstimatedArrivalTime(estimatedArrivalTime: ZonedDateTime?) {
+
+    val timeBlock = if (estimatedArrivalTime != null) {
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(estimatedArrivalTime)
+    } else {
+        "Unknown time"
+    }
+
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier.padding(top = 10.dp)
+    ) {
+        Text(
+            text = "ETA $timeBlock",
+            color = Color.DarkGray,
+            fontSize = 18.sp
+        )
+    }
+
+}
+
+@Composable
+private fun DisplayStationName(stationName: String) {
+    Column(
+    ) {
+        Text(
+            stationName,
+            color = Color.DarkGray,
+            fontSize = 18.sp
+        )
+    }
+}
+
+@Composable
+private fun DisplayLineName(lineName: String) {
+    Column() {
+        Text(
+            lineName,
+            color = Color.DarkGray
+        )
+    }
+}
+
+@Composable
+private fun DividerLine() {
+
+    Column(
+        modifier = Modifier
+            .padding(
+                top = 10.dp,
+                bottom = 20.dp
+            )
+    ) {
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+        )
+    }
+}
+
+@Composable
+private fun TrainInfoBlock(stationName: String, lineName: String, departureTime: ZonedDateTime?) {
+
+    val timeBlock = if (departureTime != null) {
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(departureTime)
+    } else {
+        "Unknown time"
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Column {
+            DisplayStationName(stationName)
+            DisplayLineName(lineName)
+        }
+        Column {
+            Text(
+                text = timeBlock,
+                fontSize = 17.sp
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    device = "spec:width=1280dp,height=800dp,dpi=480",
+    showBackground = true, showSystemUi = true
+)
+@Composable
+private fun Preview_NotificationScreen() {
+    NotificationScreen(
+        state = NotificationsUiState(
+            UserInfo(
+                onTime = false,
+                estimatedArrivalTime = ZonedDateTime.now().plusMinutes(5)
+            ),
+            TrainInfo(
+                stationName = "Sunshine Station",
+                lineName = "to Southern Cross",
+                departureTime = ZonedDateTime.now()
+            )
+        ),
     )
-
-
-
-
 }

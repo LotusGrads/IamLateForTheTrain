@@ -50,7 +50,7 @@ class NotificationViewModel(
 
         viewModelScope.launch ()
         {
-            PtvApi.retrofitService.getStation()
+//            PtvApi.retrofitService.getStation()
         }
 
 
