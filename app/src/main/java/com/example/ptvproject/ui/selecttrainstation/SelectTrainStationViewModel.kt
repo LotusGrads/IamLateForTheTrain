@@ -3,6 +3,7 @@ package com.example.ptvproject.ui.selecttrainstation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ptvproject.api.GoogleApiService
 import com.example.ptvproject.api.PtvApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +16,9 @@ class SelectTrainStationViewModel : ViewModel() {
         MutableStateFlow(SelectTrainStationState.NoSearchQuery)
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
+    init {
+        showResponse()
+    }
     fun generateListOfTrains(input: String) {
 
         viewModelScope.launch() {
@@ -73,5 +77,15 @@ class SelectTrainStationViewModel : ViewModel() {
                 )
             }
         }
+    }
+
+
+    fun showResponse() {
+        GoogleApiService.getEta(
+            originLatitude = 35.71021948142483,
+            originLongitude = 139.81070039713515,
+            destinationLatitude = 35.658815837579276,
+            destinationLongitude = 139.74558310074775
+        )
     }
 }
