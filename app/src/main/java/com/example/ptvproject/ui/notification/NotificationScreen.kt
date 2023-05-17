@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -65,11 +66,8 @@ private fun NotificationScreen(
                 )
         ) {
             DisplayUserOnTime(onTime)
-
             DisplayEstimatedArrivalTime(estimatedArrivalTime)
-
             DividerLine()
-
             TrainInfoBlock(stationName, lineName, departureTime)
         }
     }
@@ -80,41 +78,31 @@ private fun DisplayUserOnTime(onTime: Boolean) {
     Column(
 
     ) {
-        if (onTime) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Canvas(
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            if (onTime) {
+                Box(
                     modifier = Modifier
-                        .size(size = 25.dp)
-                ) {
-                    drawCircle(
-                        color = Color(0xFF5c940d),
-                    )
-                }
+                        .size(25.dp)
+                        .background(color = Color(0xFF5c940d), shape = CircleShape)
+                )
                 Text(
                     text = "On time! :)",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 45.sp,
-                    color = Color(0xFF5c940d)
+                    style = MaterialTheme.typography.h3,
+                    color = Color(0xFF5c940d),
+                    modifier = Modifier.padding(10.dp)
                 )
-            }
-        } else {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Canvas(
+            } else {
+                Box(
                     modifier = Modifier
-                        .size(size = 25.dp)
-                ) {
-                    drawCircle(
-                        color = Color(0xFFd9480f),
-                    )
-                }
+                        .size(25.dp)
+                        .background(color = Color(0xFFd9480f), shape = CircleShape)
+                )
                 Text(
                     text = "Walk faster!",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 45.sp,
+                    style = MaterialTheme.typography.h3,
                     color = Color(0xFFd9480f),
                     modifier = Modifier.padding(10.dp)
                 )
@@ -138,8 +126,7 @@ private fun DisplayEstimatedArrivalTime(estimatedArrivalTime: ZonedDateTime?) {
     ) {
         Text(
             text = "ETA $timeBlock",
-            color = Color.DarkGray,
-            fontSize = 18.sp
+            style = MaterialTheme.typography.h6
         )
     }
 
@@ -151,7 +138,7 @@ private fun DisplayStationName(stationName: String) {
     ) {
         Text(
             stationName,
-            color = Color.DarkGray,
+            style = MaterialTheme.typography.body1,
             fontSize = 18.sp
         )
     }
@@ -162,7 +149,8 @@ private fun DisplayLineName(lineName: String) {
     Column() {
         Text(
             lineName,
-            color = Color.DarkGray
+            style = MaterialTheme.typography.body1,
+            fontSize = 15.sp
         )
     }
 }
@@ -206,7 +194,8 @@ private fun TrainInfoBlock(stationName: String, lineName: String, departureTime:
         Column {
             Text(
                 text = timeBlock,
-                fontSize = 17.sp
+                style = MaterialTheme.typography.body1,
+                fontSize = 18.sp
             )
         }
     }
@@ -223,7 +212,7 @@ private fun Preview_NotificationScreen() {
     NotificationScreen(
         state = NotificationsUiState(
             UserInfo(
-                onTime = false,
+                onTime = true,
                 estimatedArrivalTime = ZonedDateTime.now().plusMinutes(5)
             ),
             TrainInfo(
