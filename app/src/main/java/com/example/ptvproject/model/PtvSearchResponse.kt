@@ -12,11 +12,11 @@ data class PtvSearchResponse (
     @SerializedName(value = "stops"    ) var stops      : ArrayList<Stops>
 )
 
-data class Stops (
-    @SerializedName(value = "stop_name" ) var stopName  : String,
-    @SerializedName(value = "stop_id"   ) var stopId    : Int,
-    @SerializedName(value = "routes"    ) var routes    : ArrayList<Routes>,
-    @SerializedName(value = "route_type") var routeType : Int
+data class Stops(
+    @SerializedName(value = "stop_name" ) var stopName: String,
+    @SerializedName(value = "stop_id"   ) var stopId: Int?,
+    @SerializedName(value = "routes"    ) var routes: List<Any>,
+    @SerializedName(value = "route_type") var routeType: Int?
 )
 
 data class Routes (

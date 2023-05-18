@@ -23,7 +23,7 @@ class SelectTrainStationViewModel : ViewModel() {
                     mutableTrainStateFlow.value = SelectTrainStationState.Loading
                 }
                 Log.d(TAG, "input: $input")
-                val response = PtvApi.retrofitService.getStation(input)
+                val response = PtvApi.PtvRepo.getStation(input)
 
                 if (response.isSuccessful) {
                     val successBody = response.body()?.stops
@@ -47,7 +47,7 @@ class SelectTrainStationViewModel : ViewModel() {
                                         Log.d(TAG, "valid station: ${stop.stopName}")
                                         var station = SelectTrainStationState.Station(
                                             stationName = stop.stopName,
-                                            stopId = stop.stopId
+                                            stopId = stop?.stopId?:0
                                         )
                                         add(station)
                                     }
