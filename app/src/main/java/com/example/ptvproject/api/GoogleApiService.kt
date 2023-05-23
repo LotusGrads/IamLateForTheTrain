@@ -1,16 +1,20 @@
 package com.example.ptvproject.api
 
+import android.util.Log
 import com.google.api.gax.core.NoCredentialsProvider
 import com.google.maps.routing.v2.*
 import com.google.type.LatLng
+import java.time.Duration
+
+private const val TAG = "Google Api Service"
 
 object GoogleApiService {
-    fun getEta(
+    fun getWalkingDurationInSeconds(
         originLatitude: Double,
         originLongitude: Double,
         destinationLatitude: Double,
         destinationLongitude: Double
-    ) {
+    ): Duration {
         val routesSettings: RoutesSettings = RoutesSettings.newBuilder()
             .setHeaderProvider {
                 buildMap {
@@ -51,38 +55,20 @@ object GoogleApiService {
                         )
                         .build()
                 )
-                .setTravelMode(RouteTravelMode.WALK).build()
+                .setComputeAlternativeRoutes(true)
+                .setTravelMode(RouteTravelMode.WALK)
+                .build()
         )
         val routesList = response.routesList
-        val firstRoute = routesList.firstOrNull()
-        //TODO: find shortest route
-        println("route: $firstRoute")
+
+        Log.d(TAG, "Route List Size: ${routesList.size}")
+        Log.d(
+            TAG, "Route Durations\n" +
+                    "${routesList.forEach { println(it.staticDuration.seconds) }}"
+        )
+
+        return Duration.ofSeconds(
+            routesList.minBy { it.staticDuration.seconds }.staticDuration.seconds
+        )
     }
 }
-
-
-/*
-import com.google.maps.routing.v2.*;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-public class Main {
-  public static void main(String[] arguments) throws IOException {
-      RoutesSettings routesSettings = RoutesSettings.newBuilder()
-              .setHeaderProvider(() -> {
-                  Map headers = new HashMap<>();
-                  headers.put("X-Goog-FieldMask", "*");
-                  return headers;
-              }).build();
-      RoutesClient routesClient = RoutesClient.create(routesSettings);
-
-      ComputeRoutesResponse response = routesClient.computeRoutes(ComputeRoutesRequest.newBuilder()
-              .setOrigin(Waypoint.newBuilder().setPlaceId("ChIJeRpOeF67j4AR9ydy_PIzPuM").build())
-              .setDestination(Waypoint.newBuilder().setPlaceId("ChIJG3kh4hq6j4AR_XuFQnV0_t8").build())
-              .setRoutingPreference(RoutingPreference.TRAFFIC_AWARE)
-              .setTravelMode(RouteTravelMode.DRIVE).build());
-      System.out.println("Response: " + response.toString());
-  }
-}
- */

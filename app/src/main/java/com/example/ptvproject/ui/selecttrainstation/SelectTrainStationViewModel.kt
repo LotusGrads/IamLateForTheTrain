@@ -16,11 +16,7 @@ class SelectTrainStationViewModel : ViewModel() {
         MutableStateFlow(SelectTrainStationState.NoSearchQuery)
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
-    init {
-        showResponse()
-    }
     fun generateListOfTrains(input: String) {
-
         viewModelScope.launch() {
             if (input.length > 2) {
                 if (mutableTrainStateFlow.value !is SelectTrainStationState.Success) {
@@ -77,15 +73,5 @@ class SelectTrainStationViewModel : ViewModel() {
                 )
             }
         }
-    }
-
-
-    fun showResponse() {
-        GoogleApiService.getEta(
-            originLatitude = 35.71021948142483,
-            originLongitude = 139.81070039713515,
-            destinationLatitude = 35.658815837579276,
-            destinationLongitude = 139.74558310074775
-        )
     }
 }
