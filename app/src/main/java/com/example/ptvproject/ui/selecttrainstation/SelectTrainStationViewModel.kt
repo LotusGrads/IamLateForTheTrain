@@ -3,7 +3,6 @@ package com.example.ptvproject.ui.selecttrainstation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ptvproject.api.GoogleApiService
 import com.example.ptvproject.api.PtvApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,7 +44,7 @@ class SelectTrainStationViewModel : ViewModel() {
                                         )
                                     ) {
                                         Log.d(TAG, "valid station: ${stop.stopName}")
-                                        var station = SelectTrainStationState.Station(
+                                        val station = SelectTrainStationState.Station(
                                             stationName = stop.stopName,
                                             stopId = stop.stopId
                                         )
