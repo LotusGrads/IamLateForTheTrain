@@ -16,7 +16,6 @@ class SelectTrainStationViewModel : ViewModel() {
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
 
     fun generateListOfTrains(input: String) {
-
         viewModelScope.launch() {
             if (input.length > 2) {
                 if (mutableTrainStateFlow.value !is SelectTrainStationState.Success) {
@@ -45,7 +44,7 @@ class SelectTrainStationViewModel : ViewModel() {
                                         )
                                     ) {
                                         Log.d(TAG, "valid station: ${stop.stopName}")
-                                        var station = SelectTrainStationState.Station(
+                                        val station = SelectTrainStationState.Station(
                                             stationName = stop.stopName,
                                             stopId = stop?.stopId?:0
                                         )
