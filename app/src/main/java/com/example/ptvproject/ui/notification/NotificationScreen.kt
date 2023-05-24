@@ -220,6 +220,6 @@ private fun Preview_NotificationScreen() {
                 lineName = "to Southern Cross",
                 departureTime = ZonedDateTime.now()
             )
-        ),
+        )
     )
 }
