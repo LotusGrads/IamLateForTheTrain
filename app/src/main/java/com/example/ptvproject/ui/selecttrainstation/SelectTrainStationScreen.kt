@@ -1,5 +1,9 @@
 package com.example.ptvproject.ui.selecttrainstation
 
+import android.Manifest
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -9,16 +13,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
@@ -52,6 +55,8 @@ private fun SelectTrainStation(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val input = remember { mutableStateOf("") }
+
+        RequestUserLocation()
 
         SearchBar(
             input = input,
@@ -152,3 +157,33 @@ private fun TrainStationList(
     }
 }
 
+@Composable
+private fun RequestUserLocation() {
+
+    val context = LocalContext.current
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted: Boolean ->
+            if (isGranted) {
+                Toast.makeText(context, "Permission Granted", Toast.LENGTH_LONG).show()
+
+            } else {
+                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+    Button(
+        onClick = {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    ) {
+        Text(text = "Request Location Permission")
+    }
+}
+
+@Preview
+@Composable
+private fun SelectTrainStationPreview() {
+
+}

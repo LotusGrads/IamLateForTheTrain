@@ -4,6 +4,7 @@ import androidx.compose.foundation.MutatePriority
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ptvproject.api.PtvApi
+import com.example.ptvproject.ui.selecttrainline.TrainLineUiState
 import com.example.ptvproject.ui.selecttrainstation.SelectTrainStationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,10 @@ import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
 class NotificationViewModel(
-    private val trainInfo: SelectTrainStationState.Station,
+    private val station: SelectTrainStationState.Station,
+    private val trainLineUiState: TrainLineUiState,
+
+    //private val trainInfo: SelectTrainStationState.Station,
     // train line from previous screen
     private val line: String,
     // train departure time from previous screen
@@ -25,7 +29,7 @@ class NotificationViewModel(
     private val _notificationsUiState =
         MutableStateFlow(NotificationsUiState(
             userInfo = UserInfo(false, null),
-            trainInfo = TrainInfo(trainInfo.stationName, line, departureTime)
+            trainInfo = TrainInfo(station.stationName, line, departureTime)
         ))
 
     val notificationsUiState: StateFlow<NotificationsUiState> =
