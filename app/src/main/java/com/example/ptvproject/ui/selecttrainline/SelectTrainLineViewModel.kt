@@ -95,14 +95,6 @@ class SelectTrainLineViewModel(
         return "hi"
     }
 
-
-    fun showAlertDialog() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                isDepartureTimeSelected = true
-            )
-        }
-    }
 }
 
 

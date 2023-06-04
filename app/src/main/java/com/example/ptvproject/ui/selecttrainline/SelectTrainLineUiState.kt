@@ -1,9 +1,9 @@
 package com.example.ptvproject.ui.selecttrainline
 
+
 data class TrainLineUiState(
     val stopName: String = "",
     val listOfDepartures: List<Departures>,
-    val isDepartureTimeSelected: Boolean = false
 )
 
 data class Departures(

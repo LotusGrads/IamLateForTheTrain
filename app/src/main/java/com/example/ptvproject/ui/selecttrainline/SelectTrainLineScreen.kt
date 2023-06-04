@@ -1,7 +1,6 @@
 package com.example.ptvproject.ui.selecttrainline
 
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,9 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
@@ -19,21 +16,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ptvproject.R
 import com.example.ptvproject.ui.theme.PTVprojectTheme
-import java.time.ZonedDateTime
 import androidx.compose.foundation.layout.Column as Column
-import com.example.ptvproject.ui.selecttrainline.ConfirmTrainLineDialog as ConfirmTrainLineDialog
 
 @Composable
 fun SelectTrainLineScreen(
     selectTrainLineViewModel: SelectTrainLineViewModel = viewModel(),
-    //onTrainLineSelected: (departureTime: ZonedDateTime, stationName: String, trainLine: String, direction: String) -> Unit
-) {
+    onTrainLineSelected: (String, String, String, String) -> Unit,
+
+    ) {
     //:: function reference
     Scaffold(
         topBar = {
@@ -46,16 +41,12 @@ fun SelectTrainLineScreen(
         val selectTrainLineUiState by selectTrainLineViewModel.uiState.collectAsState()
 
         SelectTrainLineContent(
+            modifier = Modifier.padding(it),
             trainLineUiState = selectTrainLineUiState,
             updateTrainLineScreenState = selectTrainLineViewModel::updateTrainLineScreenState,
-            showAlertDialog = selectTrainLineViewModel::showAlertDialog,
-            modifier = Modifier.padding(it)
+            onTrainLineSelected = onTrainLineSelected,
         )
-        if (selectTrainLineUiState.isDepartureTimeSelected) {
-            ConfirmTrainLineDialog(
-                onConfirm = { /*TODO: Handle navigation */ }
-            )
-        }
+
     }
 }
 
@@ -64,8 +55,8 @@ fun SelectTrainLineContent(
     modifier: Modifier = Modifier,
     trainLineUiState: TrainLineUiState,
     updateTrainLineScreenState: () -> String,
-    showAlertDialog: () -> Unit,
-) {
+    onTrainLineSelected: (String, String, String, String) -> Unit,
+    ) {
     Card(
         modifier = Modifier
             .background(color = Color(0xFFE1FFD7))
@@ -80,11 +71,12 @@ fun SelectTrainLineContent(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier.fillMaxWidth()
             ) {
+                Spacer(modifier = Modifier.width(20.dp))
                 Text(
                     text = trainLineUiState.stopName,
                     style = MaterialTheme.typography.h1
                 )
-                Spacer(modifier = Modifier.width(90.dp))
+                Spacer(modifier = Modifier.width(100.dp))
                 Image(
                     modifier = modifier
                         .size(40.dp)
@@ -104,7 +96,8 @@ fun SelectTrainLineContent(
                         SelectTrainLineItemRow(
                             item = item,
                             selectedDepartureTime = updateTrainLineScreenState(),
-                            showAlertDialog = showAlertDialog
+                            trainLineUiState = trainLineUiState,
+                            onTrainLineSelected = onTrainLineSelected,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -140,8 +133,9 @@ fun SelectTrainLineContent(
 fun SelectTrainLineItemRow(
     item: Departures,
     selectedDepartureTime: String,
-    showAlertDialog: () -> Unit,
     modifier: Modifier = Modifier,
+    trainLineUiState: TrainLineUiState,
+    onTrainLineSelected: (departureTime: String, stationName: String, trainLine: String, direction: String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -184,7 +178,14 @@ fun SelectTrainLineItemRow(
                                 .wrapContentSize()
                                 .selectable(
                                     selected = selectedDepartureTime == it.timeOfDeparture,
-                                    onClick = showAlertDialog
+                                    onClick = {
+                                        onTrainLineSelected(
+                                            it.timeOfDeparture,
+                                            trainLineUiState.stopName,
+                                            item.routeName,
+                                            item.direction
+                                        )
+                                    }
                                 )
                         )
                     }
@@ -195,66 +196,6 @@ fun SelectTrainLineItemRow(
     }
 }
 
-@Composable
-private fun ConfirmTrainLineDialog(
-    onConfirm: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    AlertDialog(
-        onDismissRequest = {
-            //Dismiss dialog when user clicks outside dialog
-        },
-        title = {
-            Text(
-                text = "You have selected a train line!",
-                style = MaterialTheme.typography.body2
-            )
-        },
-        text = {
-            Text(
-                text = "Click continue to receive notifications of your timeliness.",
-                style = MaterialTheme.typography.body1
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    //TODO: parse in > schedule departure time, stop name, train line and direction
-                    onConfirm()
-                },
-                border = BorderStroke(1.dp, Color.Black),
-                shape = RoundedCornerShape(0),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFF317B3A),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "Confirm",
-                    style = MaterialTheme.typography.body1
-                )
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = {
-                    //  activity.finish()
-                },
-                border = BorderStroke(1.dp, Color.Black),
-                shape = RoundedCornerShape(0),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFF317B3A),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "Back",
-                    style = MaterialTheme.typography.body1
-                )
-            }
-        }
-    )
-}
 
 @Composable
 fun PtvAppBar(
@@ -324,10 +265,10 @@ fun TrainLineScreenLotsOfDeparturesPreview() {
                             )
                         )
                     ),
-                    isDepartureTimeSelected = false
                 ),
-                updateTrainLineScreenState = { "Alamein " }) {
-            }
+                updateTrainLineScreenState = { "Alamein" },
+                onTrainLineSelected = { _, _, _, _ -> }
+            )
         }
     }
 }
@@ -353,10 +294,10 @@ fun TrainLineScreenOneDeparturePreview() {
                             )
                         )
                     ),
-                    isDepartureTimeSelected = false
                 ),
-                updateTrainLineScreenState = { "Alamein " }) {
-            }
+                updateTrainLineScreenState = { "Alamein " },
+                onTrainLineSelected = { _, _, _, _ -> }
+            )
         }
     }
 }
@@ -373,10 +314,10 @@ fun TrainLineScreenNoDeparturesPreview() {
                     stopName = "Melbourne Central Station",
                     listOfDepartures = listOf(
                     ),
-                    isDepartureTimeSelected = false
                 ),
-                updateTrainLineScreenState = { "Alamein " }) {
-            }
+                updateTrainLineScreenState = { "Alamein " },
+                onTrainLineSelected = { _, _, _, _ -> }
+            )
         }
     }
 }
@@ -465,28 +406,14 @@ fun TrainLineScreenScrollableDeparturesPreview() {
                             )
                         )
                     ),
-                    isDepartureTimeSelected = false
                 ),
-                updateTrainLineScreenState = { "Alamein " }) {
-            }
-        }
-    }
-}
-
-
-@Preview
-@Composable
-fun AlertDialogPreview() {
-    PTVprojectTheme {
-        Box(
-            modifier = Modifier.background(color = Color(0xFFE1FFD7))
-        ) {
-            ConfirmTrainLineDialog(
-                onConfirm = {},
+                updateTrainLineScreenState = { "Alamein " },
+                onTrainLineSelected = { _, _, _, _ -> }
             )
         }
     }
 }
+
 
 @Preview
 @Composable
