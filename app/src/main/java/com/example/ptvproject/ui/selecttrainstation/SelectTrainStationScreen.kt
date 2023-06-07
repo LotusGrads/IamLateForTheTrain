@@ -1,12 +1,13 @@
 package com.example.ptvproject.ui.selecttrainstation
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
-import android.location.LocationManager
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,13 +26,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import java.util.concurrent.TimeUnit
 
 /**
  * Input: User inputs a string
  * Action: Search, click on train station
  * Output: List of train stations
  */
+
+lateinit var locationCallback: LocationCallback
+lateinit var locationProvider: FusedLocationProviderClient
 
 @Composable
 fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onTrainStationSelected: (stopId: Int, stationName: String) -> Unit) {
@@ -53,6 +62,7 @@ private fun SelectTrainStation(
 ) {
     val focusManager = LocalFocusManager.current
 
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -60,7 +70,8 @@ private fun SelectTrainStation(
         val input = remember { mutableStateOf("") }
 
         Spacer(modifier = Modifier.height(30.dp))
-        RequestUserLocation()
+        RequestUserLocationPermission()
+        RetrieveUserLocation()
         Spacer(modifier = Modifier.height(20.dp))
 
         SearchBar(
@@ -164,10 +175,9 @@ private fun TrainStationList(
 }
 
 @Composable
-private fun RequestUserLocation() {
+private fun RequestUserLocationPermission() {
 
     val context = LocalContext.current
-
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -192,7 +202,128 @@ private fun RequestUserLocation() {
 @Composable
 private fun RetrieveUserLocation() {
 
+    val context = LocalContext.current
 
+    val location = getUserLocation(context)
+    Text(
+        text = location.toString()
+    )
+
+}
+const val LOCATION_TAG = "LOCATION_TAG"
+
+@SuppressLint("MissingPermission")
+@Composable
+fun getUserLocation(context: Context): LatandLong {
+
+    // The Fused Location Provider provides access to location APIs.
+    locationProvider = LocationServices.getFusedLocationProviderClient(context)
+
+    var currentUserLocation by remember { mutableStateOf(LatandLong()) }
+
+    DisposableEffect(key1 = locationProvider) {
+
+        // locationCallBack notifies the user of their location
+        locationCallback = object : LocationCallback() {
+            // the function below retrieves that location information
+            override fun onLocationResult(result: LocationResult) {
+                /**
+                 * Option 1
+                 * This option returns the locations computed, ordered from oldest to newest.
+                 * */
+                for (location in result.locations) {
+                    // Update data class with location data
+                    currentUserLocation = LatandLong(location.latitude, location.longitude)
+                    Log.d(LOCATION_TAG, "${location.latitude},${location.longitude}")
+                }
+
+
+                /**
+                 * Option 2
+                 * This option returns the most recent historical location currently available.
+                 * Will return null if no historical location is available
+                 * */
+                locationProvider.lastLocation
+                    .addOnSuccessListener { location ->
+                        location?.let {
+                            val lat = location.latitude
+                            val long = location.longitude
+                            // Update data class with location data
+                            currentUserLocation = LatandLong(latitude = lat, longitude = long)
+                        }
+                    }
+                    .addOnFailureListener {
+                        Log.e("Location_error", "${it.message}")
+                    }
+
+            }
+        }
+        //2
+//        if (hasPermissions(
+//                context,
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            )
+//        ) {
+            initiateLocationRequest()
+//        } else {
+//            askPermissions(
+//                context, REQUEST_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            )
+//        }
+        //3
+        onDispose {
+            stopLocationUpdate()
+        }
+    }
+    //4
+    return currentUserLocation
+}
+
+//data class to store the user Latitude and longitude
+data class LatandLong(
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
+)
+
+
+@SuppressLint("MissingPermission")
+fun initiateLocationRequest() {
+    locationCallback.let {
+        //An encapsulation of various parameters for requesting
+        // location through FusedLocationProviderClient.
+        val locationRequest: LocationRequest =
+            LocationRequest.create().apply {
+                interval = TimeUnit.SECONDS.toMillis(60)
+                fastestInterval = TimeUnit.SECONDS.toMillis(30)
+                maxWaitTime = TimeUnit.MINUTES.toMillis(2)
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            }
+        //use FusedLocationProviderClient to request location update
+        locationProvider.requestLocationUpdates(
+            locationRequest,
+            it,
+            Looper.getMainLooper()
+        )
+    }
+
+}
+
+fun stopLocationUpdate() {
+    try {
+        //Removes all location updates for the given callback.
+        val removeTask = locationProvider.removeLocationUpdates(locationCallback)
+        removeTask.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(LOCATION_TAG, "Location Callback removed.")
+            } else {
+                Log.d(LOCATION_TAG, "Failed to remove Location Callback.")
+            }
+        }
+    } catch (se: SecurityException) {
+        Log.e(LOCATION_TAG, "Failed to remove Location Callback.. $se")
+    }
 }
 
 @Preview
