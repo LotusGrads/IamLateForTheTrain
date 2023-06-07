@@ -86,6 +86,8 @@ dependencies {
 
     implementation 'io.github.raamcosta.compose-destinations:core:1.6.38-beta'
     ksp 'io.github.raamcosta.compose-destinations:ksp:1.6.38-beta'
+
     implementation 'com.google.maps:google-maps-routing:1.2.0'
     implementation 'io.grpc:grpc-okhttp:1.55.1'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
