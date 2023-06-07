@@ -16,5 +16,13 @@ data class DepartureTimes(
     val timeOfDeparture: String = ""
 )
 
+sealed class NewTrainUiState(){
+    data class SucessfulState(
+        val stopName: String = "",
+        val listOfDepartures: List<Departures>,
+    ): NewTrainUiState()
+    object Loading : NewTrainUiState()
+    object NoTrainsFound : NewTrainUiState()
+}
 
 

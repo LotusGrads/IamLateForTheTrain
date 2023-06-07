@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
  */
 
 @Composable
-fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onTrainStationSelected: (stopId: Int) -> Unit) {
+fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onTrainStationSelected: (stopId: Int, stationName: String) -> Unit) {
     val state by viewModel.trainStateFlow.collectAsState()
 
     SelectTrainStation(
@@ -42,7 +42,7 @@ fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onTrainStationSel
 private fun SelectTrainStation(
     onSearchClicked: (String) -> Unit,
     stateOfTrains: SelectTrainStationState,
-    onTrainStationSelected: (stopId: Int) -> Unit,
+    onTrainStationSelected: (stopId: Int, stationName: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -139,13 +139,13 @@ private fun TrainStationCard(
 @Composable
 private fun TrainStationList(
     stationList: List<SelectTrainStationState.Station>,
-    onTrainStationSelected: (stopId: Int) -> Unit
+    onTrainStationSelected: (stopId: Int, stationName: String) -> Unit
 ) {
     LazyColumn {
         items(stationList) { station ->
             TrainStationCard(
                 station = station,
-                onClick = { onTrainStationSelected(station.stopId) },
+                onClick = { onTrainStationSelected(station.stopId, station.stationName) },
                 modifier = Modifier.animateItemPlacement()
             )
         }

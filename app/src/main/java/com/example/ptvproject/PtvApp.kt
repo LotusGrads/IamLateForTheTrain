@@ -19,8 +19,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun SelectTrainStation(navigator: DestinationsNavigator) {
     SelectTrainStation(
         viewModel = SelectTrainStationViewModel(),
-        onTrainStationSelected = { stopId ->
-            navigator.navigate(SelectTrainLineDestination(stationName = "", stopId = stopId))
+        onTrainStationSelected = { stopId, stationName ->
+            navigator.navigate(SelectTrainLineDestination(stationName = stationName, stopId = stopId))
         }
     )
 }
@@ -33,12 +33,15 @@ fun SelectTrainLine(navigator: DestinationsNavigator, stationName: String, stopI
             station = SelectTrainStationState.Station(
                 stationName,
                 stopId
-            )),
-//            onTrainLineSelected = { timeOfDeparture, stationName ->
-//                navigator.navigate(NotificationDestination(timeOfDeparture = timeOfDeparture))
-//          }
+            )
+        ),
+        onTrainLineSelected = { departureTime, stationName, trainLine, direction ->
+            navigator.navigate(NotificationDestination())
+        }
     )
 }
+//stationName
+//departureTime
 
 @Destination
 @Composable
