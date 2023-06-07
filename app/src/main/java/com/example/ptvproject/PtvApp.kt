@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ptvproject.destinations.NotificationDestination
 import com.example.ptvproject.destinations.SelectTrainLineDestination
-import com.example.ptvproject.ui.notification.Notification
+import com.example.ptvproject.ui.notification.NotificationScreen
 import com.example.ptvproject.ui.notification.NotificationViewModel
 import com.example.ptvproject.ui.selecttrainline.SelectTrainLineScreen
 import com.example.ptvproject.ui.selecttrainline.SelectTrainLineViewModel
@@ -13,6 +13,7 @@ import com.example.ptvproject.ui.selecttrainstation.SelectTrainStationState
 import com.example.ptvproject.ui.selecttrainstation.SelectTrainStationViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.time.ZonedDateTime
 
 @Destination(start = true)
 @Composable
@@ -45,6 +46,24 @@ fun SelectTrainLine(navigator: DestinationsNavigator, stationName: String, stopI
 
 @Destination
 @Composable
-fun Notification() {
+fun Notification(
+    navigator: DestinationsNavigator,
+    stationName: String,
+    stationId: Int,
+    trainLineId: String,
+    departureTime: String) {
 //    Notification(vM = NotificationViewModel(stationId = 1, trainLineId = 1))
+    // we need train station name, train line and departure time
+
+    NotificationScreen(
+        viewModel = NotificationViewModel(
+            station = SelectTrainStationState.Station(
+                stationName,
+                stationId
+            ),
+            line = trainLineId,
+            departureTime = ZonedDateTime.parse(departureTime)
+        )
+    )
+
 }

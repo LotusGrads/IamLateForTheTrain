@@ -14,8 +14,6 @@ import java.time.ZonedDateTime
 
 class NotificationViewModel(
     private val station: SelectTrainStationState.Station,
-    private val trainLineUiState: TrainLineUiState,
-
     //private val trainInfo: SelectTrainStationState.Station,
     // train line from previous screen
     private val line: String,

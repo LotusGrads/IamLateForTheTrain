@@ -1,6 +1,8 @@
 package com.example.ptvproject.ui.selecttrainstation
 
 import android.Manifest
+import android.content.Context
+import android.location.LocationManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getSystemService
 
 /**
  * Input: User inputs a string
@@ -56,7 +59,9 @@ private fun SelectTrainStation(
     ) {
         val input = remember { mutableStateOf("") }
 
+        Spacer(modifier = Modifier.height(30.dp))
         RequestUserLocation()
+        Spacer(modifier = Modifier.height(20.dp))
 
         SearchBar(
             input = input,
@@ -90,6 +95,7 @@ private fun SelectTrainStation(
             }
         }
     }
+
 
 }
 
@@ -162,12 +168,12 @@ private fun RequestUserLocation() {
 
     val context = LocalContext.current
 
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted: Boolean ->
             if (isGranted) {
                 Toast.makeText(context, "Permission Granted", Toast.LENGTH_LONG).show()
-
             } else {
                 Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
             }
@@ -178,12 +184,20 @@ private fun RequestUserLocation() {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     ) {
-        Text(text = "Request Location Permission")
+        Text(text = "Use current location as starting point")
     }
+}
+
+// call this function when permission has been granted
+@Composable
+private fun RetrieveUserLocation() {
+
+
 }
 
 @Preview
 @Composable
 private fun SelectTrainStationPreview() {
+
 
 }

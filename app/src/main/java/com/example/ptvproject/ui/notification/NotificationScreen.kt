@@ -30,7 +30,7 @@ import java.time.format.FormatStyle
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun Notification(viewModel: NotificationViewModel) {
+fun NotificationScreen(viewModel: NotificationViewModel) {
     val state by viewModel.notificationsUiState.collectAsState()
     NotificationScreen(state = state)
 }
