@@ -69,6 +69,7 @@ private fun SelectTrainStation(
     ) {
         val input = remember { mutableStateOf("") }
 
+        // use button and text, then call the functions from the VM
         Spacer(modifier = Modifier.height(30.dp))
         RequestUserLocationPermission()
         RetrieveUserLocation()
@@ -214,12 +215,12 @@ const val LOCATION_TAG = "LOCATION_TAG"
 
 @SuppressLint("MissingPermission")
 @Composable
-fun getUserLocation(context: Context): LatandLong {
+fun getUserLocation(context: Context): SelectTrainStationState.LatAndLong {
 
     // The Fused Location Provider provides access to location APIs.
     locationProvider = LocationServices.getFusedLocationProviderClient(context)
 
-    var currentUserLocation by remember { mutableStateOf(LatandLong()) }
+    var currentUserLocation by remember { mutableStateOf(SelectTrainStationState.LatAndLong()) }
 
     DisposableEffect(key1 = locationProvider) {
 
@@ -233,7 +234,8 @@ fun getUserLocation(context: Context): LatandLong {
                  * */
                 for (location in result.locations) {
                     // Update data class with location data
-                    currentUserLocation = LatandLong(location.latitude, location.longitude)
+                    currentUserLocation =
+                        SelectTrainStationState.LatAndLong(location.latitude, location.longitude)
                     Log.d(LOCATION_TAG, "${location.latitude},${location.longitude}")
                 }
 
@@ -249,7 +251,8 @@ fun getUserLocation(context: Context): LatandLong {
                             val lat = location.latitude
                             val long = location.longitude
                             // Update data class with location data
-                            currentUserLocation = LatandLong(latitude = lat, longitude = long)
+                            currentUserLocation =
+                                SelectTrainStationState.LatAndLong(latitude = lat, longitude = long)
                         }
                     }
                     .addOnFailureListener {
@@ -282,10 +285,7 @@ fun getUserLocation(context: Context): LatandLong {
 }
 
 //data class to store the user Latitude and longitude
-data class LatandLong(
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0
-)
+
 
 
 @SuppressLint("MissingPermission")

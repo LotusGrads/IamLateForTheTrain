@@ -73,4 +73,7 @@ class SelectTrainStationViewModel : ViewModel() {
             }
         }
     }
+
+    // TODO: add RequestUserLocationPermission(), RetrieveUserLocation(),
+    //  getUserLocation(context), stopLocationUpdate()
 }
