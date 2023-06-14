@@ -40,7 +40,12 @@ fun SelectTrainLine(navigator: DestinationsNavigator, stationName: String, stopI
             )
         ),
         onTrainLineSelected = { departureTime, stationName, trainLine, direction ->
-            navigator.navigate(NotificationDestination())
+            navigator.navigate(NotificationDestination(
+                stationName = stationName,
+                stationId = stopId,
+                trainLineId = trainLine,
+                departureTime = departureTime,
+            ),)
         }
     )
 }

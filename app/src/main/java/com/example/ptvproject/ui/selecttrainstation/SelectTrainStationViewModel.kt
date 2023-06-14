@@ -18,6 +18,7 @@ class SelectTrainStationViewModel : ViewModel() {
 
 
     fun generateListOfTrains(input: String) {
+        val input = input.trim()
         viewModelScope.launch() {
             if (input.length > 2) {
                 if (mutableTrainStateFlow.value !is SelectTrainStationState.Success) {

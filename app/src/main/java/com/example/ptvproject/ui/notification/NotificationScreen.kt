@@ -11,6 +11,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,6 +32,15 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun NotificationScreen(viewModel: NotificationViewModel) {
+
+    //when we notice the screen appears, we start location request
+    //when we notice the screen disappears, we stop location request
+    //using disposable effect
+    DisposableEffect(key1 = Unit) {
+        viewModel.initiateLocationRequest()
+        onDispose { viewModel.stopLocationUpdate() }
+    }
+
     val state by viewModel.notificationsUiState.collectAsState()
     NotificationScreen(state = state)
 }
@@ -53,12 +63,12 @@ private fun NotificationScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .width(intrinsicSize = IntrinsicSize.Min)
+            .fillMaxWidth()
 
     ) {
         Column(
             modifier = Modifier
-                .widthIn(100.dp, 400.dp)
+                .fillMaxWidth()
                 .padding(
                     top = 70.dp,
                     start = 45.dp,
@@ -76,7 +86,6 @@ private fun NotificationScreen(
 @Composable
 private fun DisplayUserOnTime(onTime: Boolean) {
     Column(
-
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -138,8 +147,7 @@ private fun DisplayStationName(stationName: String) {
     ) {
         Text(
             stationName,
-            style = MaterialTheme.typography.body1,
-            fontSize = 18.sp
+            style = MaterialTheme.typography.h5,
         )
     }
 }
@@ -149,28 +157,21 @@ private fun DisplayLineName(lineName: String) {
     Column() {
         Text(
             lineName,
-            style = MaterialTheme.typography.body1,
-            fontSize = 15.sp
         )
     }
 }
 
 @Composable
 private fun DividerLine() {
-
-    Column(
+    Divider(
         modifier = Modifier
             .padding(
                 top = 10.dp,
                 bottom = 20.dp
             )
-    ) {
-        Divider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-        )
-    }
+            .fillMaxWidth()
+            .height(2.dp)
+    )
 }
 
 @Composable
@@ -194,8 +195,6 @@ private fun TrainInfoBlock(stationName: String, lineName: String, departureTime:
         Column {
             Text(
                 text = timeBlock,
-                style = MaterialTheme.typography.body1,
-                fontSize = 18.sp
             )
         }
     }
@@ -208,11 +207,34 @@ private fun TrainInfoBlock(stationName: String, lineName: String, departureTime:
     showBackground = true, showSystemUi = true
 )
 @Composable
-private fun Preview_NotificationScreen() {
+private fun Preview_NotificationScreen_OnTime() {
     NotificationScreen(
         state = NotificationsUiState(
             UserInfo(
                 onTime = true,
+                estimatedArrivalTime = ZonedDateTime.now().plusMinutes(5)
+            ),
+            TrainInfo(
+                stationName = "Sunshine Station",
+                lineName = "to Southern Cross",
+                departureTime = ZonedDateTime.now()
+            ),
+        )
+    )
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    device = "spec:width=1280dp,height=800dp,dpi=480",
+    showBackground = true, showSystemUi = true
+)
+@Composable
+private fun Preview_NotificationScreen_Late() {
+    NotificationScreen(
+        state = NotificationsUiState(
+            UserInfo(
+                onTime = false,
                 estimatedArrivalTime = ZonedDateTime.now().plusMinutes(5)
             ),
             TrainInfo(
