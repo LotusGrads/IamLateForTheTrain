@@ -20,8 +20,8 @@ class SelectTrainLineViewModel(
     // station stopId and stopName from previous screen
     private val station: SelectTrainStationState.Station,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(TrainLineUiState("", emptyList()))
-    val uiState: StateFlow<TrainLineUiState> = _uiState.asStateFlow()
+    private val _uiState : MutableStateFlow<NewTrainUiState> = MutableStateFlow(NewTrainUiState.Loading)
+    val uiState: StateFlow<NewTrainUiState> = _uiState.asStateFlow()
 
     var selectedTrainLine by mutableStateOf("")
 
@@ -34,6 +34,7 @@ class SelectTrainLineViewModel(
     //Show next three departures for each directionId
     fun showNextThreeDeparturesForEachDirection() {
         viewModelScope.launch() {
+            _uiState.emit(NewTrainUiState.Loading)
             val response = PtvApi.PtvRepo.getDepartures(routeType = 0, stopId = station.stopId)
 
             //Return an emptyList of departures to allow for code to be executed and sorted
@@ -71,16 +72,16 @@ class SelectTrainLineViewModel(
                         listOfDepartureTimes = departures.map { DepartureTimes(it.scheduledDepartureUtc) })
                 }
 
-            //Display a list of departures for the station
-            _uiState.emit(
-                TrainLineUiState(
+            if(arrayOfDeparturesWithDirection.isEmpty()) {
+                _uiState.emit(NewTrainUiState.NoTrainsFound)
+            } else {
+                _uiState.emit(NewTrainUiState.SucessfulState(
                     stopName = station.stationName,
                     listOfDepartures = arrayOfDeparturesWithDirection
-                )
-            )
+                ))
+            }
         }
     }
-
 
     //View model makes decision as to what happens
     //Update screen state when user selects train line by setting confirmingTrainLine to true
@@ -95,14 +96,6 @@ class SelectTrainLineViewModel(
         return "hi"
     }
 
-
-    fun showAlertDialog() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                isDepartureTimeSelected = true
-            )
-        }
-    }
 }
 
 
