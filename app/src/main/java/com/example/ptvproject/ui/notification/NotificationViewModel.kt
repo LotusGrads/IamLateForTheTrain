@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ptvproject.api.GoogleApiService
 import com.example.ptvproject.ui.selecttrainstation.LOCATION_TAG
 import com.example.ptvproject.ui.selecttrainstation.SelectTrainStationState
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAmount
 import java.util.concurrent.TimeUnit
@@ -42,9 +44,6 @@ class NotificationViewModel(
              * */
             for (location in result.locations) {
                 locationFlow.tryEmit(Location(location.latitude, location.longitude))
-                // Update data class with location data
-//                currentUserLocation =
-//                    SelectTrainStationState.Location(location.latitude, location.longitude)
                 Log.d(LOCATION_TAG, "${location.latitude},${location.longitude}")
             }
         }
@@ -52,37 +51,32 @@ class NotificationViewModel(
 
 
     private val _notificationsUiState = locationFlow.map { location ->
-        // TODO: figure out the ETA
-        // TODO: Figure out if the user is on time
 
-        // user ETA is based on selected arrival time - distance to next station
+        // user ETA is based on selected arrival time minus distance to next station
         // user on time is based on the user's distance to the station of choice and the ETA
 
-        // 1. use the user's current location and station location, plug it into google to find walking time
-        // 2. use the walking time and add it on top of the departureTime
-        // 3. display this for the user
+        val userInfo = if (location != null) {
+            val latitude = location.latitude
+            val longitude = location.longitude
 
-        // 1. for the onTime boolean, if the ETA is the same or earlier than departureTime,
-        //    user is on time, else user is late
+            val walkingTime = GoogleApiService.getWalkingDurationInSeconds(
+                originLatitude = latitude,
+                originLongitude = longitude,
+                //temporarily hard-coded to North Richmond Station
+                destinationLatitude = -37.810193346702796,
+                destinationLongitude = 144.99246514027507
+            )
+            val estimatedArrivalTime = ZonedDateTime.now().plus(walkingTime)
 
-        val latitude = location?.latitude
-        val longitude = location?.longitude
-        val walkingTime: TemporalAmount? = null
-        val estimatedArrivalTime = ZonedDateTime.now().plus(walkingTime)
-
-        if (estimatedArrivalTime.isBefore(departureTime) || estimatedArrivalTime.isEqual(departureTime) ) {
             UserInfo(
-                onTime = true,
+                onTime = estimatedArrivalTime.isBefore(departureTime)
+                        || estimatedArrivalTime.isEqual(departureTime),
                 estimatedArrivalTime = estimatedArrivalTime
             )
         } else {
-            UserInfo(
-                onTime = false,
-                estimatedArrivalTime = estimatedArrivalTime
-            )
+            UserInfo(false, null)
         }
 
-        val userInfo = UserInfo(false, null)
         NotificationsUiState(
             userInfo = userInfo,
             trainInfo = TrainInfo(station.stationName, line, departureTime)
@@ -98,49 +92,6 @@ class NotificationViewModel(
     val notificationsUiState: StateFlow<NotificationsUiState> = _notificationsUiState
 
     //https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#4
-
-    // function to calculate whether the user is on time or not
-
-    fun isUserOnTime() {
-
-    }
-
-    // this is displaying the user's ETA from their current location to the station location
-    fun updateUserEstimatedArrivalTime() {
-
-    }
-
-    // here, we want to allow the screen to retrieve the information regarding the train
-    // supplied by the previous screen and display it
-    fun displayTrainInfo() {
-
-        viewModelScope.launch()
-        {
-//            PtvApi.retrofitService.getStation()
-        }
-
-
-//        _notificationsUiState.value =
-//            NotificationsUiState(trainInfo =
-//            TrainInfo(
-//                stationName = "",
-//                lineName = "",
-//                departureTime = null
-//            ))
-    }
-
-    fun displayStationName() {
-
-    }
-
-    fun displayLineName() {
-
-    }
-
-    fun displayTrainDepartureTime() {
-
-    }
-
 
     @SuppressLint("MissingPermission")
     fun initiateLocationRequest() {
