@@ -219,7 +219,7 @@ private fun Preview_NotificationScreen() {
                 stationName = "Sunshine Station",
                 lineName = "to Southern Cross",
                 departureTime = ZonedDateTime.now()
-            )
+            ),
         )
     )
 }

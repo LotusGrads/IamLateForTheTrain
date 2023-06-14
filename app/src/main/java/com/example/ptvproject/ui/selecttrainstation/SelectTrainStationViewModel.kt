@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ptvproject.api.PtvApi
+import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ class SelectTrainStationViewModel : ViewModel() {
     private val mutableTrainStateFlow: MutableStateFlow<SelectTrainStationState> =
         MutableStateFlow(SelectTrainStationState.NoSearchQuery)
     val trainStateFlow = mutableTrainStateFlow.asStateFlow()
+
 
     fun generateListOfTrains(input: String) {
         viewModelScope.launch() {
@@ -73,6 +75,12 @@ class SelectTrainStationViewModel : ViewModel() {
             }
         }
     }
+
+//    fun requestUserLocationPermission() {
+//
+//
+//
+//    }
 
     // TODO: add RequestUserLocationPermission(), RetrieveUserLocation(),
     //  getUserLocation(context), stopLocationUpdate()

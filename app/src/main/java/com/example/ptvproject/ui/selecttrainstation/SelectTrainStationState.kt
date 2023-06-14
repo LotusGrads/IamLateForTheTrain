@@ -14,9 +14,10 @@ sealed class SelectTrainStationState {
         var stationName: String,
         var stopId: Int
     )
-    data class LatAndLong(
+    data class Location(
         val latitude: Double = 0.0,
-        val longitude: Double = 0.0
+        val longitude: Double = 0.0,
+        val isGranted: Boolean = false
     )
 
     //TODO: Add a dataclass that refers to the location + location permission (isGranted)

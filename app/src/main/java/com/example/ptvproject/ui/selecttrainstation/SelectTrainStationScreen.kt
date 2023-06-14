@@ -215,12 +215,12 @@ const val LOCATION_TAG = "LOCATION_TAG"
 
 @SuppressLint("MissingPermission")
 @Composable
-fun getUserLocation(context: Context): SelectTrainStationState.LatAndLong {
+fun getUserLocation(context: Context): SelectTrainStationState.Location {
 
     // The Fused Location Provider provides access to location APIs.
     locationProvider = LocationServices.getFusedLocationProviderClient(context)
 
-    var currentUserLocation by remember { mutableStateOf(SelectTrainStationState.LatAndLong()) }
+    var currentUserLocation by remember { mutableStateOf(SelectTrainStationState.Location()) }
 
     DisposableEffect(key1 = locationProvider) {
 
@@ -235,7 +235,7 @@ fun getUserLocation(context: Context): SelectTrainStationState.LatAndLong {
                 for (location in result.locations) {
                     // Update data class with location data
                     currentUserLocation =
-                        SelectTrainStationState.LatAndLong(location.latitude, location.longitude)
+                        SelectTrainStationState.Location(location.latitude, location.longitude)
                     Log.d(LOCATION_TAG, "${location.latitude},${location.longitude}")
                 }
 
@@ -252,7 +252,7 @@ fun getUserLocation(context: Context): SelectTrainStationState.LatAndLong {
                             val long = location.longitude
                             // Update data class with location data
                             currentUserLocation =
-                                SelectTrainStationState.LatAndLong(latitude = lat, longitude = long)
+                                SelectTrainStationState.Location(latitude = lat, longitude = long)
                         }
                     }
                     .addOnFailureListener {

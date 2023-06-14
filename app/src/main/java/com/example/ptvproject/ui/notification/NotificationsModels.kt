@@ -7,6 +7,11 @@ data class NotificationsUiState(
     val trainInfo: TrainInfo,
 )
 
+data class Location(
+    val latitude: Double,
+    val longitude: Double,
+)
+
 data class UserInfo(
     val onTime: Boolean,
     val estimatedArrivalTime: ZonedDateTime?,
