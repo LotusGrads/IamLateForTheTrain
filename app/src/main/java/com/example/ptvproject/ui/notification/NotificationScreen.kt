@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -99,7 +100,7 @@ private fun DisplayUserOnTime(onTime: Boolean) {
                 )
                 Text(
                     text = "On time! :)",
-                    style = MaterialTheme.typography.h3,
+                    style = MaterialTheme.typography.h4,
                     color = Color(0xFF5c940d),
                     modifier = Modifier.padding(10.dp)
                 )
@@ -111,7 +112,7 @@ private fun DisplayUserOnTime(onTime: Boolean) {
                 )
                 Text(
                     text = "Walk faster!",
-                    style = MaterialTheme.typography.h3,
+                    style = MaterialTheme.typography.h4,
                     color = Color(0xFFd9480f),
                     modifier = Modifier.padding(10.dp)
                 )
@@ -147,7 +148,7 @@ private fun DisplayStationName(stationName: String) {
     ) {
         Text(
             stationName,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.h6,
         )
     }
 }
@@ -192,7 +193,9 @@ private fun TrainInfoBlock(stationName: String, lineName: String, departureTime:
             DisplayStationName(stationName)
             DisplayLineName(lineName)
         }
-        Column {
+        Column(
+            modifier = Modifier.padding(6.dp)
+        ) {
             Text(
                 text = timeBlock,
             )
