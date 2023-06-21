@@ -22,10 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ptvproject.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -43,7 +45,10 @@ lateinit var locationCallback: LocationCallback
 lateinit var locationProvider: FusedLocationProviderClient
 
 @Composable
-fun SelectTrainStation(viewModel: SelectTrainStationViewModel, onTrainStationSelected: (stopId: Int, stationName: String) -> Unit) {
+fun SelectTrainStation(
+    viewModel: SelectTrainStationViewModel,
+    onTrainStationSelected: (stopId: Int, stationName: String) -> Unit
+) {
     val state by viewModel.trainStateFlow.collectAsState()
 
     SelectTrainStation(
@@ -91,17 +96,24 @@ private fun SelectTrainStation(
         Spacer(modifier = Modifier.height(50.dp))
         when (stateOfTrains) {
             is SelectTrainStationState.Success -> {
-                TrainStationList(stationList = stateOfTrains.listOfStations, onTrainStationSelected = onTrainStationSelected)
+                TrainStationList(
+                    stationList = stateOfTrains.listOfStations,
+                    onTrainStationSelected = onTrainStationSelected
+                )
             }
+
             SelectTrainStationState.NoSearchQuery -> {
                 Text(text = "Please type something in")
             }
+
             SelectTrainStationState.NoTrainStationsFound -> {
                 Text(text = "No train stations found :'(")
             }
+
             SelectTrainStationState.Loading -> {
                 CircularProgressIndicator()
             }
+
             SelectTrainStationState.Error -> {
                 Text(text = "FATAL ERROR!")
             }
@@ -119,12 +131,19 @@ private fun SearchBar(
     modifier: Modifier = Modifier
 ) {
     //TODO: Insert magnifying glass icon to leadingIcon
+
     OutlinedTextField(
         value = input.value,
         onValueChange = { value: String ->
             input.value = value
         },
-        placeholder = { Text(text = "Search for a train station..") },
+        placeholder = {
+            Icon(
+                painter = painterResource(R.drawable.baseline_search_24),
+                contentDescription = "search icon",
+            )
+            Text(text = "Search for a train station..",
+            modifier = Modifier.padding(start = 30.dp))},
         shape = RoundedCornerShape(50),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -211,6 +230,7 @@ private fun RetrieveUserLocation() {
     )
 
 }
+
 const val LOCATION_TAG = "LOCATION_TAG"
 
 @SuppressLint("MissingPermission")
@@ -268,7 +288,7 @@ fun getUserLocation(context: Context): SelectTrainStationState.Location {
 //                Manifest.permission.ACCESS_COARSE_LOCATION
 //            )
 //        ) {
-            initiateLocationRequest()
+        initiateLocationRequest()
 //        } else {
 //            askPermissions(
 //                context, REQUEST_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION,
@@ -285,7 +305,6 @@ fun getUserLocation(context: Context): SelectTrainStationState.Location {
 }
 
 //data class to store the user Latitude and longitude
-
 
 
 @SuppressLint("MissingPermission")

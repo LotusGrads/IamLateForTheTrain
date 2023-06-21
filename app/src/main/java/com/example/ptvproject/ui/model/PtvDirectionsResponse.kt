@@ -1,4 +1,4 @@
-package com.example.ptvproject.model
+package com.example.ptvproject.ui.model
 
 import com.google.gson.annotations.SerializedName
 

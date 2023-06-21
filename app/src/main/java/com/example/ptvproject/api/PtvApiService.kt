@@ -1,7 +1,16 @@
 package com.example.ptvproject.api
 
 import android.util.Log
-import com.example.ptvproject.model.*
+//import com.example.ptvproject.model.*
+import com.example.ptvproject.ui.model.Departures
+import com.example.ptvproject.ui.model.Directions
+import com.example.ptvproject.ui.model.PtvDeparturesResponse
+import com.example.ptvproject.ui.model.PtvDirectionsResponse
+import com.example.ptvproject.ui.model.PtvRoutesResponse
+import com.example.ptvproject.ui.model.PtvSearchResponse
+import com.example.ptvproject.ui.model.Route
+import com.example.ptvproject.ui.model.Routes
+import com.example.ptvproject.ui.model.Stops
 import okhttp3.OkHttpClient
 import okhttp3.Interceptor
 import okhttp3.Response as OkHttpResponse
