@@ -77,7 +77,9 @@ fun SelectTrainLineContent(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(
+                            color = Color(0xFF317B3A)
+                        )
                     }}
                     NewTrainUiState.NoTrainsFound -> {
                     showNoTrainsFound(
@@ -261,7 +263,7 @@ fun PtvAppBar(
     TopAppBar(
         title = {
             Text(
-                text = "Go Back",
+                text = "Train Lines",
                 style = MaterialTheme.typography.h3,
                 color = Color.White
             )

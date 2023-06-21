@@ -1,36 +1,33 @@
 package com.example.ptvproject.ui.notification
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.time.Duration.Companion.minutes
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NotificationScreen(viewModel: NotificationViewModel) {
 
@@ -41,9 +38,19 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
         viewModel.initiateLocationRequest()
         onDispose { viewModel.stopLocationUpdate() }
     }
+    Scaffold(
+        topBar = {
+            PtvAppBar(
+                canNavigateBack = true,
+                navigateUp = { /*TODO: Handle navigation */ }
+            )
+        }
+    ) {
+        val state by viewModel.notificationsUiState.collectAsState()
+        NotificationScreen(state = state)
+    }
 
-    val state by viewModel.notificationsUiState.collectAsState()
-    NotificationScreen(state = state)
+
 }
 
 @SuppressLint("SuspiciousIndentation")
@@ -226,6 +233,35 @@ private fun Preview_NotificationScreen_OnTime() {
     )
 }
 
+@Composable
+fun PtvAppBar(
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Arrival Time",
+                style = MaterialTheme.typography.h3,
+                color = Color.White,
+                modifier = Modifier.padding(start = 10.dp)
+            )
+        },
+        backgroundColor = Color(0xFF317B3A),
+        modifier = modifier,
+        navigationIcon = {
+            if (canNavigateBack) {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back",
+                    )
+                }
+            }
+        }
+        )
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(

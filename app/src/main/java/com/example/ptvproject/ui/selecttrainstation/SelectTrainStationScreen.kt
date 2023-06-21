@@ -17,9 +17,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -44,18 +47,28 @@ import java.util.concurrent.TimeUnit
 lateinit var locationCallback: LocationCallback
 lateinit var locationProvider: FusedLocationProviderClient
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SelectTrainStation(
     viewModel: SelectTrainStationViewModel,
     onTrainStationSelected: (stopId: Int, stationName: String) -> Unit
 ) {
-    val state by viewModel.trainStateFlow.collectAsState()
+    Scaffold(
+        topBar = {
+            PtvAppBar(
+                canNavigateBack = true,
+                navigateUp = { /*TODO: Handle navigation */ }
+            )
+        }
+    ) {
+        val state by viewModel.trainStateFlow.collectAsState()
 
-    SelectTrainStation(
-        onSearchClicked = { value: String -> viewModel.generateListOfTrains(value) },
-        stateOfTrains = state,
-        onTrainStationSelected = onTrainStationSelected,
-    )
+        SelectTrainStation(
+            onSearchClicked = { value: String -> viewModel.generateListOfTrains(value) },
+            stateOfTrains = state,
+            onTrainStationSelected = onTrainStationSelected,
+        )
+    }
 }
 
 @Composable
@@ -66,7 +79,6 @@ private fun SelectTrainStation(
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
-
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -103,19 +115,30 @@ private fun SelectTrainStation(
             }
 
             SelectTrainStationState.NoSearchQuery -> {
-                Text(text = "Please type something in")
+                Text(
+                    text = "Please type something in",
+                    style = MaterialTheme.typography.body1
+                )
             }
 
             SelectTrainStationState.NoTrainStationsFound -> {
-                Text(text = "No train stations found :'(")
+                Text(
+                    text = "No train stations found :'(",
+                    style = MaterialTheme.typography.body1
+                )
             }
 
             SelectTrainStationState.Loading -> {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    color = Color(0xFF317B3A)
+                )
             }
 
             SelectTrainStationState.Error -> {
-                Text(text = "FATAL ERROR!")
+                Text(
+                    text = "FATAL ERROR!",
+                    style = MaterialTheme.typography.body1
+                )
             }
         }
     }
@@ -142,14 +165,18 @@ private fun SearchBar(
                 painter = painterResource(R.drawable.baseline_search_24),
                 contentDescription = "search icon",
             )
-            Text(text = "Search for a train station..",
-            modifier = Modifier.padding(start = 30.dp))},
+            Text(
+                text = "Search for a train station..",
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(start = 30.dp)
+            )
+        },
         shape = RoundedCornerShape(50),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         modifier = modifier
             .fillMaxWidth()
-            .padding(20.dp)
+            .padding(20.dp),
     )
 }
 
@@ -212,9 +239,13 @@ private fun RequestUserLocationPermission() {
     Button(
         onClick = {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    ) {
-        Text(text = "Use current location as starting point")
+        },
+        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF317B3A)),
+        ) {
+        Text(
+            text = "Use current location as starting point",
+            style = MaterialTheme.typography.body1,
+        color = Color.White)
     }
 }
 
@@ -343,6 +374,27 @@ fun stopLocationUpdate() {
     } catch (se: SecurityException) {
         Log.e(LOCATION_TAG, "Failed to remove Location Callback.. $se")
     }
+}
+
+@Composable
+fun PtvAppBar(
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Home",
+                style = MaterialTheme.typography.h3,
+                color = Color.White,
+                modifier = Modifier.padding(start = 10.dp)
+            )
+        },
+        backgroundColor = Color(0xFF317B3A),
+        modifier = modifier,
+
+    )
 }
 
 @Preview
